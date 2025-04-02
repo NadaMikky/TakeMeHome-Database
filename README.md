@@ -3,8 +3,4 @@ This repository contains the structured database for Take Me Home, a WVU-exclusi
 
 Brittany was here.
 Nada was here.
-<<<<<<< HEAD
 jess was here
-=======
-Hiiiiii!
->>>>>>> 70c41ffdefb6319fc680e1f4b191180564a1761c
