@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Creation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', Times, serif;
+            position: relative; /* Make the body a positioned container */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Pseudo-element for blurred background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://social.wvu.edu/files/cf8db3b6-8251-41f6-bcec-70310aaf97e3/856x482?cb=5a97cab657c8e733098332dd8174e027');
+            background-size: cover;
+            background-position: center;
+            filter: blur(5px); /* Apply blur effect */
+            z-index: -1; /* Place behind other content */
+        }
+
+        /* Styling for the signup form */
+        #signup-form {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1; /* Ensure the form is above the blurred background */
+        }
+
+        #signup-form input,
+        #signup-form button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px; /* rounded corner */
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif; /* Apply Times New Roman to inputs and button */
+            font-size: 18px; /* Increased font size for better readability */
+
+        }
+
+        /* Styling for the submit button */
+        #signup-form button {
+            background-color: #0051ff;
+            color: #fff; /* white text */
+            cursor: pointer;
+        }
+
+        #signup-form button:hover {
+            background-color: #0003b3;
+        }
+
+        @media (max-width: 500px) {
+            #signup-form {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="signup-form">
+        <input type="email" id="email" placeholder="Mix email" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button type="submit">Create Account</button>
+    </form>
+
+    <script src="signup.js"></script>
+</body>
+</html>
