@@ -1,0 +1,34 @@
+<nav style="background-color: #002855; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto;">
+      <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="location.href='home.html'">
+        <img src="icons/wv_logo.svg" alt="WVU Logo" style="width: 40px; height: 40px;" />
+        <h1 style="color: white; font-size: 24px; font-weight: bold;">Take Me Home</h1>
+      </div>
+      <div style="display: flex; gap: 24px;">
+        <a href="listings.html" class="nav-link"><img src="icons/listings_white.svg" class="nav-icon"/>Listings</a>
+        <a href="account.html" class="nav-link"><img src="icons/account_white.svg" class="nav-icon"/>Account</a>
+        <a href="login.html" class="nav-link"><img src="icons/logout.svg" class="nav-icon"/>Logout</a>
+      </div>
+    </div>
+  </nav>
+  
+  <style>
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.3s, transform 0.3s;
+    }
+    .nav-link:hover {
+      color: #ffcc00; /* WVU gold */
+      transform: scale(1.1);
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+  

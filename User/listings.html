@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ride Listings</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .listing-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .listing-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .listing-header h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #002855;
+    }
+
+    .btn {
+      background-color: #0051ff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #003bb3;
+    }
+
+    .form-section {
+      background: #fefefe;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+      margin-top: 40px;
+    }
+
+    .form-section input, .form-section select, .form-section button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <main class="container">
+    <h2>Ride Listings</h2>
+
+    <section class="form-section">
+      <h3>Create a New Listing</h3>
+      <form>
+        <label>Listing Type:</label>
+        <select required>
+          <option value="offer">Offer a Ride</option>
+          <option value="request">Request a Ride</option>
+        </select>
+
+        <label>Trip Date:</label>
+        <input type="date" required />
+
+        <label>Destination:</label>
+        <input type="text" placeholder="Enter destination" required />
+
+        <label>Meet-up Time:</label>
+        <input type="time" required />
+
+        <label>Meet-up Location:</label>
+        <input type="text" placeholder="Enter meet-up location" required />
+
+        <button type="submit" class="btn">Create Listing</button>
+      </form>
+    </section>
+
+    <section style="margin-top: 40px;">
+      <h3>Available Listings</h3>
+      <div class="listing-card">
+        <div class="listing-header">
+          <h3>Morgantown to Pittsburgh</h3>
+        </div>
+        <p><strong>Driver:</strong> A </p>
+        <p><strong>Date:</strong> April 25, 2025</p>
+        <p><strong>Time:</strong> 10:30 AM</p>
+        <p><strong>Meet-up Location:</strong> Evansdale Library</p>
+        <button class="btn">Accept</button>
+      </div>
+
+      <div class="listing-card">
+        <div class="listing-header">
+          <h3>Morgantown to Charleston</h3>
+        </div>
+        <p><strong>Rider:</strong> B </p>
+        <p><strong>Date:</strong> April 28, 2025</p>
+        <p><strong>Time:</strong> 3:45 PM</p>
+        <p><strong>Meet-up Location:</strong> Mountainlair</p>
+        <button class="btn">Accept</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
