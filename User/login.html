@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <script>
+        // Load the navbar dynamically
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-placeholder').innerHTML = data;
+            });
+    </script>
+</body>
+</html>
