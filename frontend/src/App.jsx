@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './home';
 
 function App() {
   useEffect(() => {
@@ -10,8 +11,11 @@ function App() {
   }, []);
 
   return (
-    <div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </Router>
   );
 }
 
