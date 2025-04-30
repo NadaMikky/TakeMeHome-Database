@@ -4,7 +4,7 @@ import './home.css'; // Importing CSS for styling
 
 function Home() {
   return (
-    <div>
+    <div className="home-container"> {/* Add a container to ensure full height */}
       <Navbar /> {/* Add Navbar manually */}
       {/* Hero Section */}
       <section className="hero">
@@ -14,7 +14,7 @@ function Home() {
         <div>
           <p>Your trusted WVU platform for finding and sharing rides.</p> {/* Hero description */}
         </div>
-        <a href="listings.html" className="btn">Create Listing</a> {/* Call-to-action button */}
+        <a href="/listings" className="btn">Create Listing</a> {/* Call-to-action button */}
       </section>
 
       {/* Featured Listings */}

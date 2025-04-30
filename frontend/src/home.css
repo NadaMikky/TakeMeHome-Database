@@ -6,6 +6,12 @@ html, body {
     background-color: white;
 }
 
+.home-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the container takes the full height of the viewport */
+}
+
 .hero {
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
                       url('https://social.wvu.edu/files/cf8db3b6-8251-41f6-bcec-70310aaf97e3/856x482?cb=5a97cab657c8e733098332dd8174e027');
@@ -14,7 +20,11 @@ html, body {
     color: white;
     text-align: center;
     padding: 100px 20px;
-    position: relative;
+    flex: 1; /* Allow the hero section to expand and fill the remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .hero h1 {
