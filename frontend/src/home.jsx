@@ -19,7 +19,7 @@ function Home() {
 
       {/* Featured Listings */}
       <section className="featured-listings">
-        <h2>View Listings</h2> {/* Section title */}
+        <h2>Available Listings</h2> {/* Section title */}
         <div className="listing-grid">
           {/* Example listing card */}
           <div className="listing-card">
