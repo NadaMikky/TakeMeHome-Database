@@ -5,7 +5,7 @@ import './login.css'; // Import CSS for styling
 const Login = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
