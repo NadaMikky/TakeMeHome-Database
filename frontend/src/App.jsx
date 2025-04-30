@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './home';
-import profile from './profile'; // Import Account component
-import Profile from './profile';
+import Profile from './profile'; // Fix the import to match the component name
+import Listings from './listings';
 
 function App() {
   useEffect(() => {
@@ -16,7 +16,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/account" element={<Profile />} /> {/* Add route for Account */}
+        <Route path="/profile" element={<Profile />} /> {/* Add route for Profile */}
+        <Route path="/listings" element={<Listings />} /> {/* Add route for Listings */}
       </Routes>
     </Router>
   );
