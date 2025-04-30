@@ -1,14 +1,18 @@
 import React from 'react';
-import './createAccount.css'; // Importing CSS for styling
+import './createAccount.css';
+import backgroundImage from './icons/background.jpg'; // Import the background image
 
-//NEEDS WORK
-const CreateAccount = () => {
+export default function CreateAccount() {
   return (
-    <div>
-      <h1>Create Account Page</h1>
-      {/* Add your form or content here */}
+    <div
+      className="create-account-page"
+      style={{ backgroundImage: `url(${backgroundImage})` }} // Dynamically set the background image
+    >
+      <form id="signup-form">
+        <input type="email" id="email" placeholder="Mix email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Create Account</button>
+      </form>
     </div>
   );
-};
-
-export default CreateAccount;
+}

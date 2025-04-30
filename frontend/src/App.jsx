@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './home';
-import Profile from './profile';
+import Profile from './account';
 import Listings from './listings'; // Import Listings component
 import FirstPage from './firstPage'; // Import FirstPage component
 import CreateAccount from './createAccount'; // Import CreateAccount component

@@ -1,0 +1,69 @@
+/* Container fills the viewport and centers the form */
+.create-account-page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Times New Roman', Times, serif;
+    overflow: hidden;
+  }
+
+  .create-account-page::before {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Times New Roman', Times, serif;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* The signup form box */
+  #signup-form {
+    position: relative; /* Sit above the background */
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1; 
+    width: 400px;
+    box-sizing: border-box;
+  }
+  
+  /* Inputs and button */
+  #signup-form input,
+  #signup-form button {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+    box-sizing: border-box;
+  }
+  
+  /* Button styles */
+  #signup-form button {
+    background-color: #0051ff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #signup-form button:hover {
+    background-color: #0003b3;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 500px) {
+    #signup-form {
+      width: 90%;
+      padding: 30px;
+    }
+  }

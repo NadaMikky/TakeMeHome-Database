@@ -31,7 +31,7 @@ export default function Navbar() {
             <img src={listingsIcon} alt="Listings Icon" className="nav-icon" />
             Listings
           </Link>
-          <Link to="/account" className="nav-link">
+          <Link to="/account" className="nav-link"> 
             <img src={accountIcon} alt="Profile Icon" className="nav-icon" />
             Profile
           </Link>
