@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom';
 import './login.css'; // Import CSS for styling
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -48,7 +48,7 @@ const Login = () => {
         <label htmlFor="password">Password:</label>
         <input type="password" id="password" placeholder="Enter your password" required />
 
-        <button type="submit" className="btn">Log In</button> {/* Navigate to home on submit */}
+        <button type="submit" className="btn">Log In</button>
       </form>
     </div>
   );

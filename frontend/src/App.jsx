@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import FirstPage from './firstPage'; // Import FirstPage
+import FirstPage from './firstPage';
 import Home from './home';
 import Profile from './profile';
 import Listings from './listings';
-import Login from './login'; // Import Login component
-import Navbar from './navbar'; // Import Navbar component
+import Login from './login';
+import Navbar from './navbar';
 
 function App() {
   useEffect(() => {
@@ -18,21 +18,21 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<FirstPage />} /> {/* Set FirstPage as the default route */}
+        <Route path="/" element={<FirstPage />} /> {/* FirstPage without Navbar */}
         <Route
           path="*"
           element={
             <>
-              <Navbar /> {/* Add Navbar to all pages except FirstPage */}
+              <Navbar /> {/* Navbar for all other pages */}
               <Routes>
                 <Route path="/home" element={<Home />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/listings" element={<Listings />} />
-                <Route path="/login" element={<Login />} />
               </Routes>
             </>
           }
         />
+        <Route path="/login" element={<Login />} /> {/* Login page without Navbar */}
       </Routes>
     </Router>
   );
