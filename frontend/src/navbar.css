@@ -1,8 +1,10 @@
+/* src/navbar.css */
+
 .navbar {
   background-color: #002855;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Ensure the navbar spans the full width of the screen */
+  width: 100%;
 }
 
 .navbar-container {
@@ -10,9 +12,10 @@
   justify-content: space-between;
   align-items: center;
   max-width: 1200px;
-  margin: 0 auto; /* Center the content within the navbar */
+  margin: 0 auto;
 }
 
+/* Applied directly to the <Link> */
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -26,6 +29,7 @@
 }
 
 .navbar-title {
+  margin: 0;             
   color: white;
   font-size: 24px;
   font-weight: bold;
@@ -37,12 +41,12 @@
 }
 
 .nav-link {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
   display: flex;
   align-items: center;
   gap: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
   transition: color 0.3s, transform 0.3s;
 }
 
