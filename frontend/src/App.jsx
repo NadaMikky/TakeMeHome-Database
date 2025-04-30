@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import FirstPage from './firstPage'; // Import FirstPage
 import Home from './home';
-import Profile from './profile'; // Fix the import to match the component name
+import Profile from './profile';
 import Listings from './listings';
+import Login from './login'; // Import Login component
+import Navbar from './navbar'; // Import Navbar component
 
 function App() {
   useEffect(() => {
@@ -15,9 +18,21 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} /> {/* Add route for Profile */}
-        <Route path="/listings" element={<Listings />} /> {/* Add route for Listings */}
+        <Route path="/" element={<FirstPage />} /> {/* Set FirstPage as the default route */}
+        <Route
+          path="*"
+          element={
+            <>
+              <Navbar /> {/* Add Navbar to all pages except FirstPage */}
+              <Routes>
+                <Route path="/home" element={<Home />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/listings" element={<Listings />} />
+                <Route path="/login" element={<Login />} />
+              </Routes>
+            </>
+          }
+        />
       </Routes>
     </Router>
   );

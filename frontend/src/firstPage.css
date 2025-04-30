@@ -1,0 +1,64 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Ensure html and body take the full height of the viewport */
+    font-family: 'Times New Roman', Times, serif;
+    background-color: white;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                      url('https://social.wvu.edu/files/cf8db3b6-8251-41f6-bcec-70310aaf97e3/856x482?cb=5a97cab657c8e733098332dd8174e027');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+    flex: 1; /* Allow the hero section to expand and fill the remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure the hero section spans the full width */
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin: 0;
+    color: white;
+    display: inline-block; 
+    padding: 5px 10px; 
+    border-radius: 5px;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin: 20px 0;
+    color: white;
+    display: inline-block; 
+    padding: 5px 10px; 
+    border-radius: 5px; 
+}
+
+.hero .btn {
+    background-color: #0051ff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: block; 
+    margin: 10px auto 0; 
+    width: 200px;
+}
+
+.hero .btn:hover {
+    background-color: #003bb3;
+}

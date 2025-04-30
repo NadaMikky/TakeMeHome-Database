@@ -9,18 +9,19 @@ function Home() {
       {/* Hero Section */}
       <section className="hero">
         <div>
-          <h1>Welcome to Take Me Home!</h1>
+          <h1>Welcome to Take Me Home!</h1> {/* Hero title */}
         </div>
         <div>
-          <p>Your trusted WVU platform for finding and sharing rides.</p>
+          <p>Your trusted WVU platform for finding and sharing rides.</p> {/* Hero description */}
         </div>
-        <a href="listings.html" className="btn">Create Listing</a>
+        <a href="listings.html" className="btn">Create Listing</a> {/* Call-to-action button */}
       </section>
 
       {/* Featured Listings */}
       <section className="featured-listings">
-        <h2>View Listings</h2>
+        <h2>View Listings</h2> {/* Section title */}
         <div className="listing-grid">
+          {/* Example listing card */}
           <div className="listing-card">
             <h3>Morgantown to Pittsburgh</h3>
             <p><strong>Driver:</strong> A</p>
@@ -28,6 +29,7 @@ function Home() {
             <p><strong>Time:</strong> 10:30 AM</p>
             <p><strong>Meet-up Location:</strong> Evansdale Library</p>
           </div>
+          {/* Example listing card */}
           <div className="listing-card">
             <h3>Morgantown to Charleston</h3>
             <p><strong>Rider:</strong> B</p>
