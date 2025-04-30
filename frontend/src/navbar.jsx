@@ -1,27 +1,30 @@
 import React from 'react';
-import './navbar.css'; // Importing CSS for styling
+import { Link } from 'react-router-dom';
+import './navbar.css';
 
 const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="navbar-logo" onClick={() => (window.location.href = 'home.html')}>
-          <img src="icons/wv_logo.svg" alt="WVU Logo" className="navbar-logo-img" />
-          <h1 className="navbar-title">Take Me Home</h1>
+        <div className="navbar-logo">
+          <Link to="/">
+            <img src="icons/wv_logo.svg" alt="WVU Logo" className="navbar-logo-img" />
+            <h1 className="navbar-title">Take Me Home</h1>
+          </Link>
         </div>
         <div className="navbar-links">
-          <a href="listings.html" className="nav-link">
+          <Link to="/listings" className="nav-link">
             <img src="icons/listings_white.svg" className="nav-icon" alt="Listings Icon" />
             Listings
-          </a>
-          <a href="account.html" className="nav-link">
+          </Link>
+          <Link to="/account" className="nav-link">
             <img src="icons/account_white.svg" className="nav-icon" alt="Account Icon" />
             Account
-          </a>
-          <a href="login.html" className="nav-link">
+          </Link>
+          <Link to="/login" className="nav-link">
             <img src="icons/logout.svg" className="nav-icon" alt="Logout Icon" />
             Logout
-          </a>
+          </Link>
         </div>
       </div>
     </nav>

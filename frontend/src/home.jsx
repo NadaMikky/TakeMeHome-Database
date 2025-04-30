@@ -1,11 +1,11 @@
 import React from 'react';
+import Navbar from './navbar'; // Import Navbar
 import './home.css'; // Importing CSS for styling
+
 function Home() {
   return (
     <div>
-      {/* Navbar */}
-      <div id="navbar-placeholder"></div>
-
+      <Navbar /> {/* Add Navbar manually */}
       {/* Hero Section */}
       <section className="hero">
         <div>
@@ -14,11 +14,10 @@ function Home() {
         <div>
           <p>Your trusted WVU platform for finding and sharing rides.</p>
         </div>
-        {/* Changed "View Listings" to "Create Listing" */}
         <a href="listings.html" className="btn">Create Listing</a>
       </section>
 
-      {/* Changed "Featured Listings" to "View Listings" */}
+      {/* Featured Listings */}
       <section className="featured-listings">
         <h2>View Listings</h2>
         <div className="listing-grid">
