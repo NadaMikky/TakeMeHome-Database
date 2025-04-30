@@ -2,6 +2,7 @@
   background-color: #002855;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensure the navbar spans the full width of the page */
 }
 
 .navbar-container {
@@ -9,7 +10,7 @@
   justify-content: space-between;
   align-items: center;
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto; /* Center the content within the navbar */
 }
 
 .navbar-logo {
