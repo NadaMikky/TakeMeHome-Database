@@ -11,8 +11,16 @@ export default function CreateAccount() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!firstName.trim() || !lastName.trim()) {
-      alert('First Name and Last Name are required.');
+    // Regular expression to allow only letters
+    const nameRegex = /^[A-Za-z]+$/;
+
+    if (!nameRegex.test(firstName)) {
+      alert('First Name can only contain letters.');
+      return;
+    }
+
+    if (!nameRegex.test(lastName)) {
+      alert('Last Name can only contain letters.');
       return;
     }
 
