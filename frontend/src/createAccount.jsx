@@ -3,11 +3,18 @@ import './createAccount.css';
 import backgroundImage from './icons/background.jpg'; // Import the background image
 
 export default function CreateAccount() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!firstName.trim() || !lastName.trim()) {
+      alert('First Name and Last Name are required.');
+      return;
+    }
 
     if (!email.endsWith('@mix.wvu.edu')) {
       alert('Email must end with @mix.wvu.edu.');
@@ -22,7 +29,7 @@ export default function CreateAccount() {
       return;
     }
 
-    console.log('Account created successfully');
+    console.log('Account created successfully:', { firstName, lastName, email });
     // Add account creation logic here
   };
 
@@ -32,6 +39,22 @@ export default function CreateAccount() {
       style={{ backgroundImage: `url(${backgroundImage})` }} // Dynamically set the background image
     >
       <form id="signup-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          id="firstName"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          id="lastName"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
         <input
           type="email"
           id="email"
