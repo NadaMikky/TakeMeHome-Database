@@ -13,32 +13,6 @@ export default function CreateAccount() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Regular expression to allow only letters
-    const nameRegex = /^[A-Za-z]+$/;
-
-    if (!nameRegex.test(firstName)) {
-      alert('First Name can only contain letters.');
-      return;
-    }
-
-    if (!nameRegex.test(lastName)) {
-      alert('Last Name can only contain letters.');
-      return;
-    }
-
-    if (!email.endsWith('@mix.wvu.edu')) {
-      alert('Email must end with @mix.wvu.edu.');
-      return;
-    }
-
-    // Regular expression to check for at least one letter, one number, and one symbol
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-      alert('Password must be at least 8 characters long and include at least one letter, one number, and one symbol.');
-      return;
-    }
-
     console.log('Account created successfully:', { firstName, lastName, email });
     navigate('/home'); // Redirect to the home page after successful validation
   };
@@ -68,7 +42,7 @@ export default function CreateAccount() {
         <input
           type="email"
           id="email"
-          placeholder="Mix email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
