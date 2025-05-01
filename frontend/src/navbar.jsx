@@ -15,7 +15,7 @@ export default function Navbar() {
   const handleLogout = () => {
     // Perform any logout logic here (e.g., clearing user session)
     console.log('User logged out');
-    navigate('/firstPage'); // Navigate to the firstPage
+    navigate('/'); // Navigate to the default first page
   };
 
   return (
@@ -35,7 +35,7 @@ export default function Navbar() {
             <img src={accountIcon} alt="Profile Icon" className="nav-icon" />
             Profile
           </Link>
-          <Link to="/firstPage" className="nav-link" onClick={handleLogout}>
+          <Link to="/" className="nav-link" onClick={handleLogout}>
             <img src={logoutIcon} alt="Logout Icon" className="nav-icon" />
             Logout
           </Link>
