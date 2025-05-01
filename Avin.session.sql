@@ -1,8 +1,9 @@
 -- CREATE TABLE Users (
---     Name VARCHAR(50) NOT NULL,
+--     Student_ID VARCHAR(20) PRIMARY KEY,
+--     First_Name VARCHAR(50) NOT NULL,
+--     Last_Name VARCHAR(50) NOT NULL,
 --     Email VARCHAR(100) NOT NULL UNIQUE,
 --     Password VARCHAR(255) NOT NULL,
---     Student_ID VARCHAR(20) PRIMARY KEY,
 --     Class VARCHAR(20) NOT NULL
 -- );
 
@@ -56,4 +57,5 @@
 -- );
 
 -- INSERT INTO Users
--- VALUES('Jess Remphrey','jer00027@mix.wvu.edu', 'password', '800727272', 'Sophomore');
+-- VALUES('Jess', 'Remphrey','jer00027@mix.wvu.edu', 'password', '800727272', 'Sophomore');
+

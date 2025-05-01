@@ -4,12 +4,12 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 //database connection
 const db = mysql.createConnection({
     host: 'mysql-edcf05-take-me-home.l.aivencloud.com',
     port: 15398,
-    name: "TakeMeHomeDatabase",
     user: 'avnadmin',
     password: 'AVNS_CPA5OmNrKwBD2xMko_a',
     database: 'defaultdb',
@@ -43,6 +43,20 @@ handleDisconnect();
 app.get('/', (req, res) => {
     return res.json('Hi, this is a testing msg from Backend -nada');
 });
+
+// Add User to database
+app.post('/api/createAccount', (req, res) => {
+    const { studentID, firstName, lastName, email, password, classYear } = req.body;
+  
+    const sql = 'INSERT INTO Users (Student_ID, First_Name, Last_Name, Email, Password, Class) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(sql, [studentID, firstName, lastName, email, password, classYear], (err, result) => {
+      if (err) {
+        console.error('Error inserting user:', err);
+        return res.status(500).json({ message: 'Error creating user' });
+      }
+      return res.status(201).json({ message: 'User created successfully' });
+    });
+  });
 
 app.get('/Users', (req, res) => {
     const sql = 'SELECT * FROM Users'
