@@ -13,7 +13,7 @@ export default function Navbar() {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogout = () => {
-    // Perform any logout logic here (e.g., clearing user session)
+    // Perform any logout logic here 
     console.log('User logged out');
     navigate('/'); // Navigate to the default first page
   };
