@@ -5,6 +5,16 @@
     <!-- Navbar -->
     <div id="navbar-placeholder"></div>
 
+    <form id="login-form">
+        <label for="username">Username (Email):</label>
+        <input type="email" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" minlength="8" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
     <script>
         // Load the navbar dynamically
         fetch('navbar.html')
@@ -12,6 +22,21 @@
             .then(data => {
                 document.getElementById('navbar-placeholder').innerHTML = data;
             });
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username.endsWith('@mix.wvu.edu')) {
+                event.preventDefault();
+                alert('Username must end with @mix.wvu.edu.');
+            }
+
+            if (password.length < 8) {
+                event.preventDefault();
+                alert('Password must be at least 8 characters long.');
+            }
+        });
     </script>
 </body>
 </html>
