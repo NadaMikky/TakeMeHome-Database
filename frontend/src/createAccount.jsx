@@ -13,6 +13,11 @@ export default function CreateAccount() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!email.endsWith('@mix.wvu.edu')) {
+      alert('Email must end with @mix.wvu.edu.');
+      return;
+    }
+
     console.log('Account created successfully:', { firstName, lastName, email });
     navigate('/home'); // Redirect to the home page after successful validation
   };
@@ -42,7 +47,7 @@ export default function CreateAccount() {
         <input
           type="email"
           id="email"
-          placeholder="Email"
+          placeholder="Mix email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
