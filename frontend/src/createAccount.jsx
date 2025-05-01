@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './createAccount.css';
 import backgroundImage from './icons/background.jpg'; // Import the background image
 
@@ -7,6 +8,7 @@ export default function CreateAccount() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -38,7 +40,7 @@ export default function CreateAccount() {
     }
 
     console.log('Account created successfully:', { firstName, lastName, email });
-    // Add account creation logic here
+    navigate('/home'); // Redirect to the home page after successful validation
   };
 
   return (
