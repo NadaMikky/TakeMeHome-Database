@@ -14,8 +14,11 @@ export default function CreateAccount() {
       return;
     }
 
-    if (password.length < 8) {
-      alert('Password must be at least 8 characters long.');
+    // Regular expression to check for at least one letter, one number, and one symbol
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      alert('Password must be at least 8 characters long and include at least one letter, one number, and one symbol.');
       return;
     }
 
