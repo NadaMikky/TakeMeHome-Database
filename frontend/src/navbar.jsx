@@ -29,7 +29,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">
+        <Link to="/home" className="navbar-logo">
           <img src={wvuLogo} alt="WVU Logo" className="navbar-logo-img" />
           <h1 className="navbar-title">Take Me Home</h1>
         </Link>
