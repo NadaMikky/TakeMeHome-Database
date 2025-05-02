@@ -12,10 +12,18 @@ import logoutIcon from './icons/logout.svg';
 export default function Navbar() {
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleLogout = () => {
-    // Perform any logout logic here 
-    console.log('User logged out');
+  const handleLogout = async () => {
+    const response = await fetch('http://localhost:8081/api/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (response.ok) {
+      console.log('User logged out');
     navigate('/'); // Navigate to the default first page
+    } else {
+      console.error('Logout failed');
+    } 
   };
 
   return (
