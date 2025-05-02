@@ -1,55 +1,113 @@
-/* Badges */
+/* Badges */ 
 .badge {
-    display: inline-block;
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-    color: white;
-  }
-  .badge-primary   { background-color: #0051ff; }
-  .badge-secondary { background-color: #6c757d; }
-  
-  /* Tabs */
-  .tab-control {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-  }
-  .tab-btn {
-    padding: 10px 20px;
-    margin: 0 10px;
-    border: none;
-    background: #eee;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 8px;
-  }
-  .tab-btn.active {
-    background-color: #0051ff;
-    color: white;
-  }
-  
-  /* Cards & Grid */
-  .card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-  }
-  
-  /* Lift the user-info card down */
-  .user-info-card {
-    margin-top: 20px;
-  }
-  
-  /* (Optional) Add padding around main content */
-  .container {
-    padding: 0 16px;
-  }
-  
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  color: white;
+}
+.badge-primary   { background-color: #0051ff; }
+.badge-secondary { background-color: #6c757d; }
+
+/* Tabs */
+.tab-control {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+.tab-btn {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 8px;
+}
+.tab-btn.active {
+  background-color: #0051ff;
+  color: white;
+}
+
+/* Cards & Grid */
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Lift the user-info card down */
+.user-info-card {
+  margin-top: 20px;
+}
+
+/* (Optional) Add padding around main content */
+.container {
+  padding: 0 16px;
+}
+
+
+/* ==================== Driver Section ==================== */
+
+.driver-section {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* horizontally center children */
+  text-align: center;     /* center text inside those children */
+}
+
+
+.driver-section h2 {
+  margin-bottom: 16px;
+}
+
+.driver-section .btn {
+  margin-bottom: 16px;
+}
+
+/* Form for adding/editing vehicle */
+.driver-form {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.driver-form label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: bold;
+}
+
+.driver-form input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Buttons row in driver form */
+.driver-form-buttons {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+/* Secondary button style for “Cancel” */
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
