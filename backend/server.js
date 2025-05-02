@@ -1,10 +1,25 @@
 const express = require('express');
+const session = require('express-session');
 const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }));
 app.use(express.json());
+
+// Configure account session
+app.use(session({
+    secret: 'TakeMehomeCountryroadsFromWVU',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false, // Set to true if using HTTPS
+        maxAge: 1000 * 60 * 60 * 24 // 1 day
+    }
+}));
 
 //database connection
 const db = mysql.createConnection({
@@ -40,6 +55,8 @@ function handleDisconnect() {
 
 handleDisconnect();
 
+// Database Queries
+
 app.get('/', (req, res) => {
     return res.json('Hi, this is a testing msg from Backend -nada');
 });
@@ -58,6 +75,26 @@ app.post('/api/createAccount', (req, res) => {
     });
   });
 
+  // Login User
+  app.post('/api/login', (req, res) => {
+    const {email, password } = req.body;
+    const sql = 'SELECT * FROM Users WHERE Email = ? AND Password = ?';
+
+    db.query(sql, [email, password], (err, result) => {
+    if (err) {
+      console.error('Error during login:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+
+    if (result.length > 0) {
+      req.session.user = result[0];
+      return res.status(200).json({ message: 'Login successful', user: result[0] });
+    } else {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    });
+});
+
 app.get('/Users', (req, res) => {
     const sql = 'SELECT * FROM Users'
     db.query(sql, (err, result) => {
@@ -67,5 +104,4 @@ app.get('/Users', (req, res) => {
 })
     app.listen(8081, () => {
         console.log('Listening');
-    })
-
+    });

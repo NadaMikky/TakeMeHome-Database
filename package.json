@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "express-session": "^1.18.1",
     "mysql2": "^3.14.1",
     "react-router-dom": "^7.5.3"
   }
