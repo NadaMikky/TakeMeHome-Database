@@ -6,7 +6,9 @@ import './listings.css';
 export default function Listings() {
   const [listingType, setListingType]   = useState('offer');
   const [tripDate, setTripDate]         = useState('');
+  const [destination, setDestination]   = useState('');
   const [meetTime, setMeetTime]         = useState('');
+  const [meetLocation, setMeetLocation] = useState('');
   const [licensePlate, setLicensePlate] = useState('');
   const [minTime, setMinTime]           = useState('00:00');
 
@@ -25,12 +27,14 @@ export default function Listings() {
     }
   }, [tripDate, todayString]);
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       listingType,
       tripDate,
+      destination,
       meetTime,
+      meetLocation,
       ...(listingType === 'offer' && { licensePlate }),
       // can collect other fields (destination, location, etc.)
     };
@@ -72,6 +76,8 @@ export default function Listings() {
               type="text"
               placeholder="Enter destination"
               required
+              value={destination}
+              onChange={e => setDestination(e.target.value)}
             />
 
             <label>Meet-up Time:</label>
@@ -88,6 +94,8 @@ export default function Listings() {
               type="text"
               placeholder="Enter meet-up location"
               required
+              value={meetLocation}
+              onChange={e => setMeetLocation(e.target.value)}
             />
 
             {listingType === 'offer' && (
