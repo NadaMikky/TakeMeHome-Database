@@ -1,20 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';    
 import './account.css';           
 
-export default function Account() {
+const Account = () => {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('http://localhost:8081/api/user', {
+          method: 'GET',
+          credentials: 'include', // check session cookie
+        });
+      
+        const data = await response.json();
+        if (response.ok) {
+          setUser(data.user); // Store ussr data
+        } else {
+          setError(data.message || 'Failed to fetch user data');
+          console.error('Error fetching user data:', data.message);
+        }
+    } catch (error) {
+      setError('Error fetching user data');
+      console.error('Error:', error);
+    }
+  };
+    fetchUserData();
+}, [navigate]);
+
+if (!user) {
+  return <div>Loading...</div>;
+}
 
   return (
     <>
       <Navbar />
 
       <main className="container">
-        <h1>Welcome, [User Name]</h1>
+        <h1>Welcome, {user.First_Name} {user.Last_Name}</h1>
 
         <div className="card user-info-card">
-          <p><strong>Email:</strong> jdoe@mix.wvu.edu</p>
-          <p><strong>Phone:</strong> (304) 123-4567</p>
+          <p><strong>Email:</strong> {user.Email}</p>
+          <p><strong>Class:</strong> {user.Class}</p>
         </div>
 
         <div className="tab-control">
@@ -81,3 +112,5 @@ export default function Account() {
     </>
   );
 }
+
+export default Account;

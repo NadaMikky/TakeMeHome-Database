@@ -95,6 +95,15 @@ app.post('/api/createAccount', (req, res) => {
     });
 });
 
+// Verify if user is logged in
+app.get('/api/user', (req, res) => {
+    if (req.session.user) {
+        return res.status(200).json({ loggedIn: true, user: req.session.user });
+    } else {
+        return res.status(401).json({ loggedIn: false });
+    }
+});
+
 app.get('/Users', (req, res) => {
     const sql = 'SELECT * FROM Users'
     db.query(sql, (err, result) => {
