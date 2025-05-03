@@ -21,7 +21,7 @@ export default function Account() {
   });
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showDriverForm, setShowDriverForm] = useState(false);
-  const [driverInfo, setDriverInfo]       = useState({
+  const [driverInfo, setDriverInfo] = useState({
     licenseNumber: '',
     allowSmoking: false,
     insuranceCompany: '',
@@ -47,6 +47,17 @@ export default function Account() {
   const validateCardNumber = (cardNumber) => /^\d{16}$/.test(cardNumber);
   const validateExpirationDate = (expirationDate) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(expirationDate);
   const validateCVV = (cvv) => /^\d{3,4}$/.test(cvv);
+
+  // Add validation functions for vehicle fields
+  const validateMakeAndModel = (value) => /^[A-Za-z\s]+$/.test(value); // Letters and spaces only
+  const validateYear = (year) => /^\d{4}$/.test(year) && year >= 1900 && year <= new Date().getFullYear();
+  const validateSeatingCapacity = (seatingCapacity) => /^\d+$/.test(seatingCapacity) && seatingCapacity >= 1 && seatingCapacity <= 6;
+  const validateLicensePlate = (licensePlate) => /^[A-Za-z0-9]{1,10}$/.test(licensePlate); // Alphanumeric, max 10 characters
+  const validateVIN = (vin) => /^\d+$/.test(vin); // Ensure VIN is numeric
+
+  // Add validation functions for driver fields
+  const validateInsuranceCompany = (value) => /^[A-Za-z\s]+$/.test(value); // Letters and spaces only
+  const validateLicenseNumber = (licenseNumber) => /^\d+$/.test(licenseNumber); // Numbers only
 
   // Fetch user and any relevant data on load
   useEffect(() => {
@@ -196,48 +207,86 @@ export default function Account() {
   };
 
   // Submit driver info to backend
-  const handleDriverSubmit = async e => {
+  const handleDriverSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate driver fields
+    if (!validateLicenseNumber(driverInfo.licenseNumber)) {
+      alert('License number must be numeric.');
+      return;
+    }
+    if (!validateInsuranceCompany(driverInfo.insuranceCompany)) {
+      alert('Insurance company must contain only letters and spaces.');
+      return;
+    }
+
     try {
       const resp = await fetch('http://localhost:8081/api/driver', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(driverInfo)
+        body: JSON.stringify(driverInfo),
       });
       const data = await resp.json();
       if (resp.ok) {
-        // attach returned driver to user in state
-        setUser(u => ({ ...u, driver: data.driver }));
+        // Attach returned driver info to user in state
+        setUser((u) => ({ ...u, driver: data.driver }));
         setShowDriverForm(false);
       } else {
-        setError(data.message || 'Failed to save driver info');
+        setError(data.message || 'Failed to save driver information');
       }
     } catch {
-      setError('Error saving driver info');
+      setError('Error saving driver information');
     }
   };
 
   // Submit vehicle to backend
   const handleVehicleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate vehicle fields
+    if (!validateMakeAndModel(vehicle.make)) {
+      alert('Make must contain only letters and spaces.');
+      return;
+    }
+    if (!validateMakeAndModel(vehicle.model)) {
+      alert('Model must contain only letters and spaces.');
+      return;
+    }
+    if (!validateYear(vehicle.year)) {
+      alert('Year must be a valid 4-digit number between 1900 and the current year.');
+      return;
+    }
+    if (!validateVIN(vehicle.vin)) {
+      alert('VIN must be numeric.');
+      return;
+    }
+    if (!validateLicensePlate(vehicle.licensePlate)) {
+      alert('License plate must be alphanumeric and up to 10 characters.');
+      return;
+    }
+    if (!validateSeatingCapacity(vehicle.seatingCapacity)) {
+      alert('Seating capacity must be a number between 1 and 6.');
+      return;
+    }
+
     try {
       const resp = await fetch('http://localhost:8081/api/vehicle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(vehicle)
+        body: JSON.stringify(vehicle),
       });
       const data = await resp.json();
       if (resp.ok) {
-        // attach returned vehicle to user in state
+        // Attach returned vehicle info to user in state
         setUser((u) => ({ ...u, vehicle: data.vehicle }));
         setShowVehicleForm(false);
       } else {
-        setError(data.message || 'Failed to save vehicle');
+        setError(data.message || 'Failed to save vehicle information');
       }
     } catch {
-      setError('Error saving vehicle');
+      setError('Error saving vehicle information');
     }
   };
 
@@ -412,28 +461,12 @@ export default function Account() {
               />
 
               <label>Allow Smoking:</label>
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="allowSmoking"
-                    value="true"
-                    checked={driverInfo.allowSmoking === true}
-                    onChange={() => setDriverInfo((d) => ({ ...d, allowSmoking: true }))}
-                  />
-                  Yes
-                </label>
-                <label style={{ marginLeft: '10px' }}>
-                  <input
-                    type="radio"
-                    name="allowSmoking"
-                    value="false"
-                    checked={driverInfo.allowSmoking === false}
-                    onChange={() => setDriverInfo((d) => ({ ...d, allowSmoking: false }))}
-                  />
-                  No
-                </label>
-              </div>
+              <input
+                type="checkbox"
+                name="allowSmoking"
+                checked={driverInfo.allowSmoking}
+                onChange={handleDriverChange}
+              />
 
               <label>Insurance Company:</label>
               <input
@@ -505,11 +538,14 @@ export default function Account() {
                 value={vehicle.year}
                 onChange={handleVehicleChange}
                 required
+                min="1900"
+                max={new Date().getFullYear()}
               />
 
               <label>VIN:</label>
               <input
                 name="vin"
+                type="text" // Keep as text to allow numeric input
                 value={vehicle.vin}
                 onChange={handleVehicleChange}
                 required
