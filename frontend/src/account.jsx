@@ -43,6 +43,11 @@ export default function Account() {
   });
   const navigate = useNavigate();
 
+  // Add validation functions for payment fields
+  const validateCardNumber = (cardNumber) => /^\d{16}$/.test(cardNumber);
+  const validateExpirationDate = (expirationDate) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(expirationDate);
+  const validateCVV = (cvv) => /^\d{3,4}$/.test(cvv);
+
   // Fetch user and any relevant data on load
   useEffect(() => {
     async function fetchUser() {
@@ -111,11 +116,11 @@ export default function Account() {
     setPassengerInfo(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
   };
 
-    // Handle payment form field changes
-    const handlePaymentChange = (e) => {
-      const { name, value } = e.target;
-      setPayment((a) => ({ ...a, [name]: value }));
-    };
+  // Handle payment form field changes
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPayment((a) => ({ ...a, [name]: value }));
+  };
 
   // Handle driver form field changes
   const handleDriverChange = e => {
@@ -152,28 +157,43 @@ export default function Account() {
     }
   };
 
-    // Submit payment to backend
-    const handlePaymentSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        const resp = await fetch('http://localhost:8081/api/payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(payment)
-        });
-        const data = await resp.json();
-        if (resp.ok) {
-          // attach returned payment info to user in state
-          setUser((u) => ({ ...u, payment: data.payment }));
-          setShowPaymentForm(false);
-        } else {
-          setError(data.message || 'Failed to save payment information');
-        }
-      } catch {
-        setError('Error saving payment information');
+  // Submit payment to backend
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate payment fields
+    if (!validateCardNumber(payment.cardNumber)) {
+      alert('Card number must be 16 digits.');
+      return;
+    }
+    if (!validateExpirationDate(payment.expirationDate)) {
+      alert('Expiration date must be in MM/YY format.');
+      return;
+    }
+    if (!validateCVV(payment.cvv)) {
+      alert('CVV must be 3 or 4 digits.');
+      return;
+    }
+
+    try {
+      const resp = await fetch('http://localhost:8081/api/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payment),
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        // Attach returned payment info to user in state
+        setUser((u) => ({ ...u, payment: data.payment }));
+        setShowPaymentForm(false);
+      } else {
+        setError(data.message || 'Failed to save payment information');
       }
-    };
+    } catch {
+      setError('Error saving payment information');
+    }
+  };
 
   // Submit driver info to backend
   const handleDriverSubmit = async e => {
