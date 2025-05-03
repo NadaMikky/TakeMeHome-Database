@@ -21,6 +21,18 @@ app.use(session({
     }
 }));
 
+// Logout
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Error during logout:', err);
+            return res.status(500).json({ message: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        return res.status(200).json({ message: 'Logout successful' });
+    });
+});
+
 //database connection
 const db = mysql.createConnection({
     host: 'mysql-edcf05-take-me-home.l.aivencloud.com',
@@ -93,6 +105,15 @@ app.post('/api/createAccount', (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
     });
+});
+
+// Verify if user is logged in
+app.get('/api/user', (req, res) => {
+    if (req.session.user) {
+        return res.status(200).json({ loggedIn: true, user: req.session.user });
+    } else {
+        return res.status(401).json({ loggedIn: false });
+    }
 });
 
 app.get('/Users', (req, res) => {
