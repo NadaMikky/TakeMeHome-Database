@@ -63,10 +63,17 @@
 --     Card_Number VARCHAR(16) NOT NULL UNIQUE,
 --     Expiration_Date VARCHAR(5) NOT NULL,
 --     CVV VARCHAR(4) NOT NULL,
---     FOREIGN KEY (ID_Number) REFERENCES Users(Student_ID)
+--     FOREIGN KEY (ID_Number) REFERENCES Passenger(Student_ID)
 -- );
 
 -- ALTER TABLE Ride_Request AUTO_INCREMENT = 100000000;
 -- ALTER TABLE Ride_Request AUTO_INCREMENT = 600000000;
+-- ALTER TABLE Passenger ADD Payment VARCHAR(20) NOT NULL DEFAULT 'Unknown';
 
-SELECT * FROM Users;
+-- SELECT * FROM Users;
+-- SELECT * FROM Passenger;
+-- SELECT * FROM Driver;
+-- SELECT * FROM Vehicle;
+-- SELECT * FROM Ride_Request;
+-- SELECT * FROM Ride_Offer;
+-- SELECT * FROM Payment_Info;

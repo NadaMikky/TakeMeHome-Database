@@ -8,8 +8,26 @@ export default function Account() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
+  const [showPassengerForm, setShowPassengerForm] = useState(false);
+  const [passengerInfo, setPassengerInfo] = useState({
+    hasLuggage: false,
+    payment: '',
+  });
+  const [paymentInfo, setShowPaymentInfo] = useState({
+    paymentMethod: '',
+    cardNumber: '',
+    expirationDate: '',
+    cvv: '',
+  });
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showDriverForm, setShowDriverForm] = useState(false);
+  const [driverInfo, setDriverInfo]       = useState({
+    licenseNumber: '',
+    allowSmoking: false,
+    insuranceCompany: '',
+  });
+
   const [showVehicleForm, setShowVehicleForm] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(false); // State to toggle payment form
   const [vehicle, setVehicle] = useState({
     make: '',
     model: '',
@@ -23,10 +41,9 @@ export default function Account() {
     expirationDate: '',
     cvv: ''
   });
-
   const navigate = useNavigate();
 
-  // 1) Fetch user (and any existing vehicle or payment info) on load
+  // Fetch user and any relevant data on load
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -37,6 +54,34 @@ export default function Account() {
         const data = await resp.json();
         if (resp.ok) {
           setUser(data.user);
+
+          if (data.user.passenger) {
+            // preload passenger into form state
+            setPassengerInfo({
+              hasLuggage: data.user.passenger.hasLuggage || false,
+              payment: data.user.passenger.payment || ''
+            });
+          }
+
+          if (data.user.payment) {
+            // preload payment into form state
+            setPayment({
+              paymentMethod: data.user.payment.paymentMethod || '',
+              cardNumber: data.user.payment.cardNumber || '',
+              expirationDate: data.user.payment.expirationDate || '',
+              cvv: data.user.payment.cvv || ''
+            });
+          }
+
+          if (data.user.driver) {
+            // preload driver into form state
+            setDriverInfo({
+              licenseNumber: data.user.driver.licenseNumber || '',
+              allowSmoking: data.user.driver.allowSmoking || false,
+              insuranceCompany: data.user.driver.insuranceCompany || ''
+            });
+          }
+
           if (data.user.vehicle) {
             // preload vehicle into form state
             setVehicle({
@@ -46,14 +91,6 @@ export default function Account() {
               vin: data.user.vehicle.vin || '',
               licensePlate: data.user.vehicle.licensePlate || '',
               seatingCapacity: data.user.vehicle.seatingCapacity || ''
-            });
-          }
-          if (data.user.payment) {
-            // preload payment into form state
-            setPayment({
-              cardNumber: data.user.payment.cardNumber || '',
-              expirationDate: data.user.payment.expirationDate || '',
-              cvv: data.user.payment.cvv || ''
             });
           }
         } else {
@@ -68,13 +105,100 @@ export default function Account() {
 
   if (!user) return <div>Loading...</div>;
 
-  // 2) Handle vehicle form field changes
+  // Handle passenger form field changes
+  const handlePassengerChange = e => {
+    const { name, value, type, checked } = e.target;
+    setPassengerInfo(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+    // Handle payment form field changes
+    const handlePaymentChange = (e) => {
+      const { name, value } = e.target;
+      setPayment((a) => ({ ...a, [name]: value }));
+    };
+
+  // Handle driver form field changes
+  const handleDriverChange = e => {
+    const { name, value, type, checked } = e.target;
+    setDriverInfo(d => ({ ...d, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  // Handle vehicle form field changes
   const handleVehicleChange = (e) => {
     const { name, value } = e.target;
     setVehicle((v) => ({ ...v, [name]: value }));
   };
 
-  // 3) Submit vehicle to backend
+  // Submit passenger info to backend
+  const handlePassengerSubmit = async e => {
+    e.preventDefault();
+    try {
+      const resp = await fetch('http://localhost:8081/api/passenger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(passengerInfo)
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        // attach returned passenger to user in state
+        setUser(u => ({ ...u, passenger: data.passenger }));
+        setShowPassengerForm(false);
+      } else {
+        setError(data.message || 'Failed to save passenger info');
+      }
+    } catch {
+      setError('Error saving passenger info');
+    }
+  };
+
+    // Submit payment to backend
+    const handlePaymentSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const resp = await fetch('http://localhost:8081/api/payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payment)
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          // attach returned payment info to user in state
+          setUser((u) => ({ ...u, payment: data.payment }));
+          setShowPaymentForm(false);
+        } else {
+          setError(data.message || 'Failed to save payment information');
+        }
+      } catch {
+        setError('Error saving payment information');
+      }
+    };
+
+  // Submit driver info to backend
+  const handleDriverSubmit = async e => {
+    e.preventDefault();
+    try {
+      const resp = await fetch('http://localhost:8081/api/driver', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(driverInfo)
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        // attach returned driver to user in state
+        setUser(u => ({ ...u, driver: data.driver }));
+        setShowDriverForm(false);
+      } else {
+        setError(data.message || 'Failed to save driver info');
+      }
+    } catch {
+      setError('Error saving driver info');
+    }
+  };
+
+  // Submit vehicle to backend
   const handleVehicleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -97,35 +221,6 @@ export default function Account() {
     }
   };
 
-  // 4) Handle payment form field changes
-  const handlePaymentChange = (e) => {
-    const { name, value } = e.target;
-    setPayment((p) => ({ ...p, [name]: value }));
-  };
-
-  // 5) Submit payment to backend
-  const handlePaymentSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const resp = await fetch('http://localhost:8081/api/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payment)
-      });
-      const data = await resp.json();
-      if (resp.ok) {
-        // attach returned payment info to user in state
-        setUser((u) => ({ ...u, payment: data.payment }));
-        setShowPaymentForm(false);
-      } else {
-        setError(data.message || 'Failed to save payment information');
-      }
-    } catch {
-      setError('Error saving payment information');
-    }
-  };
-
   return (
     <>
       <Navbar />
@@ -137,10 +232,53 @@ export default function Account() {
           <p><strong>Class:</strong> {user.Class}</p>
         </div>
 
-        {/* PAYMENT SECTION */}
-        <div className="payment-section">
-          <h2>Payment Information</h2>
+        {/* PASSENGER SECTION */}
+        <div className="passenger-section">
+          <h2>Passenger Information</h2>
+          
+          {/* If they already have passenger info & not editing, show it */}
+          {user.passenger && !showPassengerForm && (
+            <div className="card">
+              <p><strong>Has Luggage:</strong> {user.passenger.hasLuggage ? 'Yes' : 'No'}</p>
+              <p><strong>Luggage Size:</strong> {user.passenger.luggageSize}</p>
+              <button className="btn" onClick={() => setShowPassengerForm(true)}>
+                Edit Passenger Information
+              </button>
+            </div>
+          )}
 
+          {/* If no passenger info yet & not editing, show “Add” button */}
+          {!user.passenger && !showPassengerForm && (
+            <button className="btn" onClick={() => setShowPassengerForm(true)}>
+              Add Passenger Information
+            </button>
+          )}
+
+          {/* PASSENGER FORM */}
+          {showPassengerForm && (
+            <form className="passenger-form" onSubmit={handlePassengerSubmit}>
+              <label>Has Luggage:</label>
+              <input
+                type="checkbox"
+                name="hasLuggage"
+                checked={passengerInfo.hasLuggage}
+                onChange={handlePassengerChange}
+              />
+
+              <div className="passenger-form-buttons">
+                <button type="submit" className="btn">Save Passenger</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowPassengerForm(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+        {/* PAYMENT SECTION */}
           {/* If they already have payment info & not editing, show it */}
           {user.payment && !showPaymentForm && (
             <div className="card">
@@ -162,6 +300,21 @@ export default function Account() {
           {/* PAYMENT FORM */}
           {showPaymentForm && (
             <form className="payment-form" onSubmit={handlePaymentSubmit}>
+              <label>Payment Mehtod:</label>
+              <select
+                name="paymentMethod"
+                value={payment.paymentMethod}
+                onChange={handlePaymentChange}
+                required
+              >
+                <option value="">Select a payment method</option>
+                <option value="visa">Visa</option>
+                <option value="masterCard">Master Card</option>
+                <option value="discover">Discover</option>
+                <option value="americanExpress">American Express</option>
+                <option value="other">Other</option>
+              </select>
+
               <label>Card Number:</label>
               <input
                 type="text"
@@ -207,6 +360,67 @@ export default function Account() {
         {/* DRIVER SECTION */}
         <div className="driver-section">
           <h2>Driver Information</h2>
+
+          {/* If they already have driver info & not editing, show it */}
+          {user.driver && !showDriverForm && (
+            <div className="card">
+              <p><strong>License Number:</strong> {user.driver.licenseNumber}</p>
+              <p><strong>Allow Smoking:</strong> {user.driver.allowSmoking ? 'Yes' : 'No'}</p>
+              <p><strong>Insurance Company:</strong> {user.driver.insuranceCompany}</p>
+              <button className="btn" onClick={() => setShowDriverForm(true)}>
+                Edit Driver Information
+              </button>
+            </div>
+          )}
+
+          {/* If no driver info yet & not editing, show “Add” button */}
+          {!user.driver && !showDriverForm && (
+            <button className="btn" onClick={() => setShowDriverForm(true)}>
+              Add Driver Information
+            </button>
+          )}
+
+          {/* DRIVER FORM */}
+          {showDriverForm && (
+            <form className="driver-form" onSubmit={handleDriverSubmit}>
+              <label>License Number:</label>
+              <input
+                type="text"
+                name="licenseNumber"
+                value={driverInfo.licenseNumber}
+                onChange={handleDriverChange}
+                required
+              />
+
+              <label>Allow Smoking:</label>
+              <input
+                type="checkbox"
+                name="allowSmoking"
+                checked={driverInfo.allowSmoking}
+                onChange={handleDriverChange}
+              />
+
+              <label>Insurance Company:</label>
+              <input
+                type="text"
+                name="insuranceCompany"
+                value={driverInfo.insuranceCompany}
+                onChange={handleDriverChange}
+                required
+              />
+
+              <div className="driver-form-buttons">
+                <button type="submit" className="btn">Save Driver</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowDriverForm(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
 
           {/* If they already have a vehicle & not editing, show it */}
           {user.vehicle && !showVehicleForm && (

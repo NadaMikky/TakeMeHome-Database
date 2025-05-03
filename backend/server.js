@@ -44,7 +44,7 @@ const db = mysql.createConnection({
         rejectUnauthorized: false // optional, but recommended
     }
 });
-// subbject to be removed 
+// subject to be removed 
 function handleDisconnect() {
     db.connect(err => {
         if (err) {
@@ -126,3 +126,161 @@ app.get('/Users', (req, res) => {
     app.listen(8081, () => {
         console.log('Listening');
     });
+
+// Add Passenger to database
+app.post('/api/passenger', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const studentID = req.session.user.Student_ID;
+    const { hasLuggage, payment } = req.body;
+
+    const paymentValue = payment || (req.session.user.payment?.paymentMethod || 'Unknown');
+
+    const sql = 'SELECT * FROM Passenger WHERE Student_ID = ?';
+    db.query(sql, [studentID], (err, result) => {
+        if (err) {
+            console.error('Error checking passenger:', err);
+            return res.status(500).json({ message: 'Error checking passenger' });
+        }
+
+        const query = result.length > 0
+            ? 'UPDATE Passenger SET Has_Luggage = ?, Payment = ? WHERE Student_ID = ?'
+            : 'INSERT INTO Passenger (Student_ID, Has_Luggage, Payment) VALUES (?, ?, ?)';
+
+        const params = result.length > 0
+            ? [hasLuggage, paymentValue, studentID]
+            : [studentID, hasLuggage, paymentValue];
+
+        db.query(query, params, (err2)  => {
+            if (err2) {
+                console.error('Error inserting/updating passenger:', err2);
+                return res.status(500).json({ message: 'Error inserting/updating passenger' });
+            }
+
+            const updatedPassenger = { hasLuggage, payment: paymentValue }
+            req.session.user.passenger = updatedPassenger; // Update session with passenger info
+            return res.status(200).json({ message: 'Passenger information saved successfully' });
+        });
+    });
+});
+
+// Add Driver to database
+app.post('/api/driver', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const studentID = req.session.user.Student_ID;
+    const { licenseNumber, allowSmoking, insuranceCompany } = req.body;
+
+    const sql = 'SELECT * FROM Driver WHERE Student_ID = ?';
+    db.query(sql, [studentID], (err, result) => {
+        if (err) {
+            console.error('Error checking driver:', err);
+            return res.status(500).json({ message: 'Error checking driver' });
+        }
+
+        const query = result.length > 0
+            ? 'UPDATE Driver SET License_Number = ?, Allow_Smoking = ?, Insurance_Company = ? WHERE Student_ID = ?'
+            : 'INSERT INTO Driver (Student_ID, License_Number, Allow_Smoking, Insurance_Company) VALUES (?, ?, ?, ?)';
+
+        const params = result.length > 0
+            ? [licenseNumber, allowSmoking, insuranceCompany, studentID]
+            : [studentID, licenseNumber, allowSmoking, insuranceCompany];
+        db.query(query, params, (err2) => {
+            if (err2) {
+                console.error('Error inserting/updating driver:', err2);
+                return res.status(500).json({ message: 'Error inserting/updating driver' });
+            }
+
+            const updatedDriver = { licenseNumber, allowSmoking, insuranceCompany }
+            req.session.user.driver = updatedDriver; // Update session with driver info
+            return res.status(200).json({ message: 'Driver information saved successfully' });
+        });
+    });
+});
+
+// Add Payment to database
+app.post('/api/payment', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const studentID = req.session.user.Student_ID;
+    const { paymentMethod, cardNumber, expirationDate, cvv } = req.body;
+
+    const sql = 'SELECT * FROM Payment_Info WHERE ID_Number = ?';
+    db.query(sql, [studentID], (err, result) => {
+        if (err) {
+            console.error('Error checking payment:', err);
+            return res.status(500).json({ message: 'Error checking payment' });
+        }
+
+        const query = result.length > 0
+            ? 'UPDATE Payment_Info SET Payment_Method = ?, Card_Number = ?, Expiration_Date = ?, CVV = ? WHERE ID_Number = ?'
+            : 'INSERT INTO Payment_Info (ID_Number, Payment_Method, Card_Number, Expiration_Date, CVV) VALUES (?, ?, ?, ?, ?)';
+
+        const params = result.length > 0
+            ? [paymentMethod, cardNumber, expirationDate, cvv, studentID]
+            : [studentID, paymentMethod, cardNumber, expirationDate, cvv];
+
+        db.query(query, params, (err2) => {
+            if (err2) {
+                console.error('Error inserting/updating payment:', err2);
+                return res.status(500).json({ message: 'Error inserting/updating payment' });
+            }
+
+            // Add to passenger table if exists
+            const updatePassenger = 'UPDATE Passenger SET Payment = ? WHERE Student_ID = ?';
+            db.query(updatePassenger, [paymentMethod, studentID], (err3) => {
+                if (err3) {
+                    console.error('Error updating passenger with payment:', err3);
+                    return res.status(500).json({ message: 'Error updating passenger with payment' });
+                }
+            });
+
+            const updatedPayment = { paymentMethod, cardNumber, expirationDate, cvv }
+            req.session.user.payment = updatedPayment; // Update session with payment info
+            return res.status(200).json({ message: 'Payment information saved successfully' });
+        });
+    });
+});
+
+// Add vehile to database
+app.post('/api/vehicle', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const studentID = req.session.user.Student_ID;
+    const { make, model, year, vin, licensePlate, seatingCapacity } = req.body;
+
+    const sql = 'SELECT * FROM Vehicle WHERE Student_ID = ?';
+    db.query(sql, [studentID], (err, result) => {
+        if (err) {
+            console.error('Error checking vehicle:', err);
+            return res.status(500).json({ message: 'Error checking vehicle' });
+        }
+
+        const query = result.length > 0
+            ? 'UPDATE Vehicle SET Make = ?, Model = ?, Year = ?, VIN = ?, License_Plate = ?, Seating_Capacity = ? WHERE Student_ID = ?'
+            : 'INSERT INTO Vehicle (Make, Model, Year, VIN, License_Plate, Seating_Capacity, Student_ID) VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+        const params = result.length > 0
+            ? [make, model, year, vin, licensePlate, seatingCapacity, studentID]
+            : [make, model, year, vin, licensePlate, seatingCapacity, studentID];
+
+        db.query(query, params, (err2) => {
+            if (err2) {
+                console.error('Error inserting/updating vehicle:', err2);
+                return res.status(500).json({ message: 'Error inserting/updating vehicle' });
+            }
+
+            const updatedVehicle = { make, model, year, vin, licensePlate, seatingCapacity }
+            req.session.user.vehicle = updatedVehicle; // Update session with vehicle info
+            return res.status(200).json({ message: 'Vehicle information saved successfully' });
+        });
+    });
+});

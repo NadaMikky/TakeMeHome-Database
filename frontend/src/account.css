@@ -112,9 +112,9 @@
   background-color: #5a6268;
 }
 
-/* ==================== Payment Section ==================== */
+/* ==================== Passenger Section ==================== */
 
-.payment-section {
+.passenger-section {
   margin-top: 40px;
   display: flex;
   flex-direction: column;
@@ -122,11 +122,11 @@
   text-align: center;     /* center text inside those children */
 }
 
-.payment-section h2 {
+.passenger-section h2 {
   margin-bottom: 16px;
 }
 
-.payment-section .btn {
+.passenger-section .btn {
   margin-bottom: 16px;
 }
 
@@ -167,3 +167,4 @@
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
