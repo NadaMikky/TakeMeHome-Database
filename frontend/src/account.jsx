@@ -5,9 +5,9 @@ import Navbar from './navbar';
 import './account.css';
 
 export default function Account() {
-  const [user, setUser]                   = useState(null);
-  const [error, setError]                 = useState('');
-  const [activeTab, setActiveTab]         = useState('pending');
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('pending');
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [vehicle, setVehicle] = useState({
     make: '',
@@ -16,6 +16,11 @@ export default function Account() {
     vin: '',
     licensePlate: '',
     seatingCapacity: ''
+  });
+  const [payment, setPayment] = useState({
+    cardNumber: '',
+    expirationDate: '',
+    cvv: ''
   });
 
   const navigate = useNavigate();
@@ -36,8 +41,8 @@ export default function Account() {
             setVehicle({
               make: data.user.vehicle.make || '',
               model: data.user.vehicle.model || '',
-              year: data.user.vehicle.year   || '',
-              vin: data.user.vehicle.vin     || '',
+              year: data.user.vehicle.year || '',
+              vin: data.user.vehicle.vin || '',
               licensePlate: data.user.vehicle.licensePlate || '',
               seatingCapacity: data.user.vehicle.seatingCapacity || ''
             });
@@ -55,13 +60,13 @@ export default function Account() {
   if (!user) return <div>Loading...</div>;
 
   // 2) Handle vehicle form field changes
-  const handleVehicleChange = e => {
+  const handleVehicleChange = (e) => {
     const { name, value } = e.target;
-    setVehicle(v => ({ ...v, [name]: value }));
+    setVehicle((v) => ({ ...v, [name]: value }));
   };
 
   // 3) Submit vehicle to backend
-  const handleVehicleSubmit = async e => {
+  const handleVehicleSubmit = async (e) => {
     e.preventDefault();
     try {
       const resp = await fetch('http://localhost:8081/api/vehicle', {
@@ -73,13 +78,40 @@ export default function Account() {
       const data = await resp.json();
       if (resp.ok) {
         // attach returned vehicle to user in state
-        setUser(u => ({ ...u, vehicle: data.vehicle }));
+        setUser((u) => ({ ...u, vehicle: data.vehicle }));
         setShowVehicleForm(false);
       } else {
         setError(data.message || 'Failed to save vehicle');
       }
     } catch {
       setError('Error saving vehicle');
+    }
+  };
+
+  // 4) Handle payment form field changes
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPayment((p) => ({ ...p, [name]: value }));
+  };
+
+  // 5) Submit payment to backend
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const resp = await fetch('http://localhost:8081/api/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payment)
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        alert('Payment information saved successfully!');
+      } else {
+        setError(data.message || 'Failed to save payment information');
+      }
+    } catch {
+      setError('Error saving payment information');
     }
   };
 
@@ -92,6 +124,42 @@ export default function Account() {
         <div className="card user-info-card">
           <p><strong>Email:</strong> {user.Email}</p>
           <p><strong>Class:</strong> {user.Class}</p>
+        </div>
+
+        {/* PAYMENT SECTION */}
+        <div className="payment-section">
+          <h2>Payment Information</h2>
+          <form className="payment-form" onSubmit={handlePaymentSubmit}>
+            <label>Card Number:</label>
+            <input
+              type="text"
+              name="cardNumber"
+              value={payment.cardNumber}
+              onChange={handlePaymentChange}
+              required
+            />
+
+            <label>Expiration Date:</label>
+            <input
+              type="text"
+              name="expirationDate"
+              placeholder="MM/YY"
+              value={payment.expirationDate}
+              onChange={handlePaymentChange}
+              required
+            />
+
+            <label>CVV:</label>
+            <input
+              type="text"
+              name="cvv"
+              value={payment.cvv}
+              onChange={handlePaymentChange}
+              required
+            />
+
+            <button type="submit" className="btn">Save Payment</button>
+          </form>
         </div>
 
         {/* DRIVER SECTION */}
