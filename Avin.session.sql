@@ -57,6 +57,15 @@
 --     FOREIGN KEY (Passenger_ID) REFERENCES Passenger(Student_ID)
 -- );
 
+-- CREATE TABLE Payment_Info (
+--     ID_Number VARCHAR(20) PRIMARY KEY,
+--     Payment_Method VARCHAR(50) NOT NULL,
+--     Card_Number VARCHAR(16) NOT NULL UNIQUE,
+--     Expiration_Date VARCHAR(5) NOT NULL,
+--     CVV VARCHAR(4) NOT NULL,
+--     FOREIGN KEY (ID_Number) REFERENCES Users(Student_ID)
+-- );
+
 -- ALTER TABLE Ride_Request AUTO_INCREMENT = 100000000;
 -- ALTER TABLE Ride_Request AUTO_INCREMENT = 600000000;
 
