@@ -11,6 +11,7 @@ export default function Listings() {
   const [meetLocation, setMeetLocation] = useState('');
   const [licensePlate, setLicensePlate] = useState('');
   const [minTime, setMinTime]           = useState('00:00');
+  const [showForm, setShowForm]       = useState(false);
 
   // Today's date in YYYY-MM-DD for the date picker min
   const todayString = new Date().toISOString().slice(0, 10);
@@ -49,6 +50,13 @@ export default function Listings() {
       <main className="container">
         <h2>Ride Listings</h2>
 
+        {!showForm && (
+          <button className="btn" onClick={() => setShowForm(true)}>
+            Create a New Listing
+          </button>
+        )}
+        
+        {showForm && (
         <section className="form-section">
           <h3>Create a New Listing</h3>
           <form onSubmit={handleSubmit}>
@@ -116,6 +124,7 @@ export default function Listings() {
             </button>
           </form>
         </section>
+        )}
 
         <section style={{ marginTop: '60px' }}>
           <h3>Available Listings</h3>

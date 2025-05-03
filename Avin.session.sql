@@ -34,27 +34,30 @@
 -- );
 
 -- CREATE TABLE Ride_Request (
---     ID_Number INT PRIMARY KEY,
+--     ID_Number INT AUTO_INCREMENT PRIMARY KEY,
 --     Trip_Date DATE NOT NULL,
 --     Meet_up_Location VARCHAR(100) NOT NULL,
 --     Destination VARCHAR(100) NOT NULL,
---     Passenger_Student_ID VARCHAR(20),
---     Driver_ID VARCHAR(20) NOT NULL,
---     FOREIGN KEY (Passenger_Student_ID) REFERENCES Passenger(Student_ID),
+--     Meet_up_Time TIME NOT NULL,
+--     Passenger_ID VARCHAR(20) NOT NULL,
+--     Driver_ID VARCHAR(20) NOT NULL DEFAULT '0',
+--     FOREIGN KEY (Passenger_ID) REFERENCES Passenger(Student_ID),
 --     FOREIGN KEY (Driver_ID) REFERENCES Driver(Student_ID)
 -- );
 
 -- CREATE TABLE Ride_Offer (
---     ID_Number INT PRIMARY KEY,
+--    ID_Number INT AUTO_INCREMENT PRIMARY KEY,
 --     Trip_Date DATE NOT NULL,
 --     Meet_up_Location VARCHAR(100) NOT NULL,
 --     Destination VARCHAR(100) NOT NULL,
 --     Meet_up_Time TIME NOT NULL,
 --     Driver_ID VARCHAR(20) NOT NULL,
---     Passenger_ID VARCHAR(20) NOT NULL,
+--     Passenger_ID VARCHAR(20) NOT NULL DEFAULT '0',
 --     FOREIGN KEY (Driver_ID) REFERENCES Driver(Student_ID),
 --     FOREIGN KEY (Passenger_ID) REFERENCES Passenger(Student_ID)
 -- );
 
-SELECT * FROM Users;
+-- ALTER TABLE Ride_Request AUTO_INCREMENT = 100000000;
+-- ALTER TABLE Ride_Request AUTO_INCREMENT = 600000000;
 
+SELECT * FROM Users;
