@@ -37,10 +37,26 @@ export default function Listings() {
       meetTime,
       meetLocation,
       ...(listingType === 'offer' && { licensePlate }),
-      // can collect other fields (destination, location, etc.)
     };
-    console.log('Creating listing:', payload);
-    // TODO: send payload to backend or update state
+
+    try {
+      const response = await fetch('/api/listings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Listing created:', data);
+        setShowForm(false);
+      } else {}
+        console.log('Failed to create listing', data);
+    } catch (error) {
+      console.error('Error creating listing:', error);
+    }
   };
 
   return (

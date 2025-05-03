@@ -284,3 +284,69 @@ app.post('/api/vehicle', (req, res) => {
         });
     });
 });
+
+// Add Listing to database
+app.post('/api/listings', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const studentID = req.session.user.Student_ID;
+    const { listingType, tripDate, destination, meetTime, meetLocation, licensePlate } = req.body;
+
+    if (listingType === 'offer') {
+        // Confirm user is a driver
+        const sqlDriver = 'SELECT * FROM Driver WHERE Student_ID = ?';
+        db.query(sqlDriver, [studentID], (err, result) => {
+            if (err) {
+                console.error('Error checking driver:', err);
+                return res.status(500).json({ message: 'Error checking driver' });
+            }
+
+            if (result.length === 0) {
+                return res.status(400).json({ message: 'User is not a driver' });
+            }
+
+            const insertOfferSQL = 
+                'INSERT INTO Ride_Offer (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID) VALUES (?, ?, ?, ?, ?)';
+            const offerParams = [tripDate, meetLocation, destination, meetTime, studentID];
+
+            db.query(insertOfferSQL, offerParams, (err2) => {
+                if (err2) {
+                    console.error('Error inserting ride offer:', err2);
+                    return res.status(500).json({ message: 'Error inserting ride offer' });
+                }
+
+                return res.status(200).json({ message: 'Ride offer created successfully' });
+            });
+        });
+    }
+
+    else if (listingType === 'request') {
+        // Confirm user is a passenger
+        const sqlPassenger = 'SELECT * FROM Passenger WHERE Student_ID = ?';
+        db.query(sqlPassenger, [studentID], (err, result) => {
+            if (err) {
+                console.error('Error checking passenger:', err);
+                return res.status(500).json({ message: 'Error checking passenger' });
+            }
+
+            if (result.length === 0) {
+                return res.status(400).json({ message: 'User is not a passenger' });
+            }
+
+            const insertRequestSQL = 
+                'INSERT INTO Ride_Request (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Passenger_ID) VALUES (?, ?, ?, ?, ?)';
+            const requestParams = [tripDate, meetLocation, destination, meetTime, studentID];
+
+            db.query(insertRequestSQL, requestParams, (err2) => {
+                if (err2) {
+                    console.error('Error inserting ride request:', err2);
+                    return res.status(500).json({ message: 'Error inserting ride request' });
+                }
+
+                return res.status(200).json({ message: 'Ride request created successfully' });
+            });
+        });
+    }
+});
