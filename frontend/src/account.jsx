@@ -240,7 +240,6 @@ export default function Account() {
           {user.passenger && !showPassengerForm && (
             <div className="card">
               <p><strong>Has Luggage:</strong> {user.passenger.hasLuggage ? 'Yes' : 'No'}</p>
-              <p><strong>Luggage Size:</strong> {user.passenger.luggageSize}</p>
               <button className="btn" onClick={() => setShowPassengerForm(true)}>
                 Edit Passenger Information
               </button>
@@ -508,6 +507,8 @@ export default function Account() {
               <input
                 name="seatingCapacity"
                 type="number"
+                min="1"
+                max="6"
                 value={vehicle.seatingCapacity}
                 onChange={handleVehicleChange}
                 required
