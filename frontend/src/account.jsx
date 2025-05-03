@@ -9,6 +9,7 @@ export default function Account() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
   const [showVehicleForm, setShowVehicleForm] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false); // State to toggle payment form
   const [vehicle, setVehicle] = useState({
     make: '',
     model: '',
@@ -25,7 +26,7 @@ export default function Account() {
 
   const navigate = useNavigate();
 
-  // 1) Fetch user (and any existing vehicle) on load
+  // 1) Fetch user (and any existing vehicle or payment info) on load
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -45,6 +46,14 @@ export default function Account() {
               vin: data.user.vehicle.vin || '',
               licensePlate: data.user.vehicle.licensePlate || '',
               seatingCapacity: data.user.vehicle.seatingCapacity || ''
+            });
+          }
+          if (data.user.payment) {
+            // preload payment into form state
+            setPayment({
+              cardNumber: data.user.payment.cardNumber || '',
+              expirationDate: data.user.payment.expirationDate || '',
+              cvv: data.user.payment.cvv || ''
             });
           }
         } else {
@@ -106,7 +115,9 @@ export default function Account() {
       });
       const data = await resp.json();
       if (resp.ok) {
-        alert('Payment information saved successfully!');
+        // attach returned payment info to user in state
+        setUser((u) => ({ ...u, payment: data.payment }));
+        setShowPaymentForm(false);
       } else {
         setError(data.message || 'Failed to save payment information');
       }
@@ -129,37 +140,68 @@ export default function Account() {
         {/* PAYMENT SECTION */}
         <div className="payment-section">
           <h2>Payment Information</h2>
-          <form className="payment-form" onSubmit={handlePaymentSubmit}>
-            <label>Card Number:</label>
-            <input
-              type="text"
-              name="cardNumber"
-              value={payment.cardNumber}
-              onChange={handlePaymentChange}
-              required
-            />
 
-            <label>Expiration Date:</label>
-            <input
-              type="text"
-              name="expirationDate"
-              placeholder="MM/YY"
-              value={payment.expirationDate}
-              onChange={handlePaymentChange}
-              required
-            />
+          {/* If they already have payment info & not editing, show it */}
+          {user.payment && !showPaymentForm && (
+            <div className="card">
+              <p><strong>Card Number:</strong> **** **** **** {user.payment.cardNumber.slice(-4)}</p>
+              <p><strong>Expiration Date:</strong> {user.payment.expirationDate}</p>
+              <button className="btn" onClick={() => setShowPaymentForm(true)}>
+                Edit Payment Information
+              </button>
+            </div>
+          )}
 
-            <label>CVV:</label>
-            <input
-              type="text"
-              name="cvv"
-              value={payment.cvv}
-              onChange={handlePaymentChange}
-              required
-            />
+          {/* If no payment info yet & not editing, show “Add” button */}
+          {!user.payment && !showPaymentForm && (
+            <button className="btn" onClick={() => setShowPaymentForm(true)}>
+              Add Payment Information
+            </button>
+          )}
 
-            <button type="submit" className="btn">Save Payment</button>
-          </form>
+          {/* PAYMENT FORM */}
+          {showPaymentForm && (
+            <form className="payment-form" onSubmit={handlePaymentSubmit}>
+              <label>Card Number:</label>
+              <input
+                type="text"
+                name="cardNumber"
+                value={payment.cardNumber}
+                onChange={handlePaymentChange}
+                required
+              />
+
+              <label>Expiration Date:</label>
+              <input
+                type="text"
+                name="expirationDate"
+                placeholder="MM/YY"
+                value={payment.expirationDate}
+                onChange={handlePaymentChange}
+                required
+              />
+
+              <label>CVV:</label>
+              <input
+                type="text"
+                name="cvv"
+                value={payment.cvv}
+                onChange={handlePaymentChange}
+                required
+              />
+
+              <div className="payment-form-buttons">
+                <button type="submit" className="btn">Save Payment</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowPaymentForm(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* DRIVER SECTION */}

@@ -111,3 +111,59 @@
 .btn-secondary:hover {
   background-color: #5a6268;
 }
+
+/* ==================== Payment Section ==================== */
+
+.payment-section {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* horizontally center children */
+  text-align: center;     /* center text inside those children */
+}
+
+.payment-section h2 {
+  margin-bottom: 16px;
+}
+
+.payment-section .btn {
+  margin-bottom: 16px;
+}
+
+/* Form for adding/editing payment */
+.payment-form {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.payment-form label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: bold;
+}
+
+.payment-form input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Buttons row in payment form */
+.payment-form-buttons {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+/* Secondary button style for “Cancel” */
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
