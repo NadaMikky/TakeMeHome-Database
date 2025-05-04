@@ -353,6 +353,7 @@ app.post('/api/listings', (req, res) => {
 
 // Get all listings
 app.get('/api/listings', (req, res) => {
+    // Offer and request listings
     const offerQuery = `SELECT 'offer' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, d.Student_ID AS Driver_ID, 'No passenger assigned' AS Passenger_ID
         FROM Ride_Offer r
         JOIN Driver d ON r.Driver_ID = d.Student_ID
@@ -406,3 +407,30 @@ app.post('/api/listings/accept', (req, res) => {
         return res.status(200).json({ message: 'Ride accepted successfully' });
     });
 });
+
+// User listings
+app.get('/api/user/listings', (req, res) => {
+    const userId = req.session.user?.Student_ID;
+  
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+  
+    const sql = `
+      SELECT 'offer' AS type, ID_Number, Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID, NULL AS Passenger_ID
+      FROM Ride_Offer
+      WHERE Driver_ID = ?
+      UNION
+      SELECT 'request' AS type, ID_Number, Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID, Passenger_ID
+      FROM Ride_Request
+      WHERE Passenger_ID = ?
+    `;
+  
+    db.query(sql, [userId, userId], (err, results) => {
+      if (err) {
+        console.error('Error fetching user listings:', err);
+        return res.status(500).json({ message: 'Error fetching user listings' });
+      }
+      res.status(200).json({ listings: results });
+    });
+  });

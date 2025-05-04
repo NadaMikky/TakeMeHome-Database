@@ -8,6 +8,7 @@ export default function Account() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
+  const [listings, setListings] = useState([]);
   const [showPassengerForm, setShowPassengerForm] = useState(false);
   const [passengerInfo, setPassengerInfo] = useState({
     hasLuggage: false,
@@ -61,15 +62,24 @@ export default function Account() {
 
   // Fetch user and any relevant data on load
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchUserAndListings() {
       try {
-        const resp = await fetch('http://localhost:8081/api/user', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        const data = await resp.json();
-        if (resp.ok) {
-          setUser(data.user);
+        const [userResp, listingsResp] = await Promise.all([
+          fetch('http://localhost:8081/api/user', {
+            method: 'GET',
+            credentials: 'include'
+          }),
+          fetch('http://localhost:8081/api/user/listings', {
+            method: 'GET',
+            credentials: 'include'
+          }),
+        ]);
+  
+        const userData = await userResp.json();
+        const listingsData = await listingsResp.json();
+  
+        if (userResp.ok) {
+          setUser(userData.user);
 
           if (data.user.passenger) {
             // preload passenger into form state
@@ -116,10 +126,15 @@ export default function Account() {
         setError('Error fetching user data');
       }
     }
-    fetchUser();
+    fetchUserAndListings();
   }, []);
 
   if (!user) return <div>Loading...</div>;
+
+  // Filter listings based on the active tab
+  const pendingListings = listings.filter(listing => listing.status === 'pending');
+  const acceptedListings = listings.filter(listing => listing.status === 'accepted');
+  const completedListings = listings.filter(listing => new Date(listing.tripDate) < new Date());
 
   // Handle passenger form field changes
   const handlePassengerChange = e => {
@@ -608,19 +623,49 @@ export default function Account() {
 
         {activeTab === 'pending' && (
           <div className="grid">
-            {/* … */}
+            {pendingListings.map(listing => (
+              <div key={listing.id} className="card">
+                <p><strong>Type:</strong> {listing.type}</p>
+                <p><strong>Trip Date:</strong> {listing.tripDate}</p>
+                <p><strong>Meet-up Location:</strong> {listing.meetLocation}</p>
+                <p><strong>Destination:</strong> {listing.destination}</p>
+                <p><strong>Status:</strong> {listing.status}</p>
+              </div>
+            ))}
+            {pendingListings.length === 0 && <p>No pending listings found.</p>}
           </div>
         )}
+
         {activeTab === 'accepted' && (
           <div className="grid">
-            {/* … */}
+            {acceptedListings.map(listing => (
+              <div key={listing.id} className="card">
+                <p><strong>Type:</strong> {listing.type}</p>
+                <p><strong>Trip Date:</strong> {listing.tripDate}</p>
+                <p><strong>Meet-up Location:</strong> {listing.meetLocation}</p>
+                <p><strong>Destination:</strong> {listing.destination}</p>
+                <p><strong>Status:</strong> {listing.status}</p>
+              </div>
+            ))}
+            {acceptedListings.length === 0 && <p>No accepted listings found.</p>}
           </div>
         )}
+
         {activeTab === 'completed' && (
           <div className="grid">
-            {/* … */}
+            {completedListings.map(listing => (
+              <div key={listing.id} className="card">
+                <p><strong>Type:</strong> {listing.type}</p>
+                <p><strong>Trip Date:</strong> {listing.tripDate}</p>
+                <p><strong>Meet-up Location:</strong> {listing.meetLocation}</p>
+                <p><strong>Destination:</strong> {listing.destination}</p>
+                <p><strong>Status:</strong> {listing.status}</p>
+              </div>
+            ))}
+            {completedListings.length === 0 && <p>No completed listings found.</p>}
           </div>
         )}
+
       </main>
     </>
   );
