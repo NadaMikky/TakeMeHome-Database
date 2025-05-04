@@ -87,3 +87,8 @@
 
 -- INSERT INTO Ride_Offer
 -- VALUES ('600000000', '2025-05-03', 'Morgantown, WV', 'Pittsburgh, PA', '08:00:00', '7009988765', '0');
+
+-- CREATE INDEX idx_rideoffer_tripdate ON Ride_Offer (Trip_Date);
+-- CREATE INDEX idx_riderequest_tripdate ON Ride_Request (Trip_Date);
+-- CREATE INDEX idx_rideoffer_driverid ON Ride_Offer (Driver_ID);
+-- CREATE INDEX idx_riderequest_passengerid ON Ride_Request (Passenger_ID);
