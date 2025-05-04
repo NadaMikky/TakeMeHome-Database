@@ -350,7 +350,7 @@ export default function Account() {
           <p><strong>Class:</strong> {user.Class}</p>
 
           <button
-            className="btn bth-danger" 
+            className="btn btn-danger" 
             onClick={async () => {
               if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
             

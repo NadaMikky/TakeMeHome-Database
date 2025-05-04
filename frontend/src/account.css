@@ -168,3 +168,12 @@
 .btn-secondary:hover {
   background-color: #5a6268;
 }
+
+/* Danger button style for “Delete” */
+button.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+button.btn-danger:hover {
+  background-color: #c82333;
+}
