@@ -81,46 +81,78 @@ export default function Account() {
         if (userResp.ok) {
           setUser(userData.user);
 
-          if (data.user.passenger) {
+          // Populate listings state
+          const normalized = listingsData.listings.map(l => {
+            const tripDate     = l.Trip_Date;
+            const meetLocation = l.Meet_up_Location;
+            const time         = l.Meet_up_Time;
+            const driverId     = l.Driver_ID;
+            const passengerId  = l.Passenger_ID;
+
+             // derive status:
+            let status;
+            if (new Date(tripDate) < new Date()) {
+              status = 'completed';
+            } else if (l.type === 'offer') {
+              status = driverId && driverId !== 0 ? 'accepted' : 'pending';
+            } else /* 'request' */ {
+              status = passengerId && passengerId !== 0 ? 'accepted' : 'pending';
+            }
+            return {
+              id:           l.ID_Number,
+              type:         l.type,
+              tripDate,
+              meetLocation,
+              destination:  l.Destination,
+              time,
+              driverId,
+              passengerId,
+              status,
+            };
+          });
+
+          setListings(normalized);
+
+          if (userData.user.passenger) {
             // preload passenger into form state
             setPassengerInfo({
-              hasLuggage: data.user.passenger.hasLuggage || false,
-              payment: data.user.passenger.payment || ''
+              hasLuggage: userData.user.passenger.hasLuggage || false,
+              payment: userData.user.passenger.payment || ''
             });
           }
 
-          if (data.user.payment) {
+          if (userData.user.payment) {
             // preload payment into form state
             setPayment({
-              paymentMethod: data.user.payment.paymentMethod || '',
-              cardNumber: data.user.payment.cardNumber || '',
-              expirationDate: data.user.payment.expirationDate || '',
-              cvv: data.user.payment.cvv || ''
+              paymentMethod: userData.user.payment.paymentMethod || '',
+              cardNumber: userData.user.payment.cardNumber || '',
+              expirationDate: userData.user.payment.expirationDate || '',
+              cvv: userData.user.payment.cvv || ''
             });
           }
 
-          if (data.user.driver) {
+          if (userData.user.driver) {
             // preload driver into form state
             setDriverInfo({
-              licenseNumber: data.user.driver.licenseNumber || '',
-              allowSmoking: data.user.driver.allowSmoking || false,
-              insuranceCompany: data.user.driver.insuranceCompany || ''
+              licenseNumber: userData.user.driver.licenseNumber || '',
+              allowSmoking: userData.user.driver.allowSmoking || false,
+              insuranceCompany: userData.user.driver.insuranceCompany || ''
             });
           }
 
-          if (data.user.vehicle) {
+          if (userData.user.vehicle) {
             // preload vehicle into form state
             setVehicle({
-              make: data.user.vehicle.make || '',
-              model: data.user.vehicle.model || '',
-              year: data.user.vehicle.year || '',
-              vin: data.user.vehicle.vin || '',
-              licensePlate: data.user.vehicle.licensePlate || '',
-              seatingCapacity: data.user.vehicle.seatingCapacity || ''
+              make: userData.user.vehicle.make || '',
+              model: userData.user.vehicle.model || '',
+              year: userData.user.vehicle.year || '',
+              vin: userData.user.vehicle.vin || '',
+              licensePlate: userData.user.vehicle.licensePlate || '',
+              seatingCapacity: userData.user.vehicle.seatingCapacity || ''
             });
           }
         } else {
-          setError(data.message || 'Failed to fetch user');
+          setError(userData.message || 'Failed to fetch user');
         }
       } catch (err) {
         setError('Error fetching user data');
@@ -132,9 +164,9 @@ export default function Account() {
   if (!user) return <div>Loading...</div>;
 
   // Filter listings based on the active tab
-  const pendingListings = listings.filter(listing => listing.status === 'pending');
-  const acceptedListings = listings.filter(listing => listing.status === 'accepted');
-  const completedListings = listings.filter(listing => new Date(listing.tripDate) < new Date());
+  const pendingListings   = listings.filter(l => l.status === 'pending');
+  const acceptedListings  = listings.filter(l => l.status === 'accepted');
+  const completedListings = listings.filter(l => l.status === 'completed');
 
   // Handle passenger form field changes
   const handlePassengerChange = e => {
@@ -623,13 +655,13 @@ export default function Account() {
 
         {activeTab === 'pending' && (
           <div className="grid">
-            {pendingListings.map(listing => (
+            {pendingListings.map(l => (
               <div key={listing.id} className="card">
-                <p><strong>Type:</strong> {listing.type}</p>
-                <p><strong>Trip Date:</strong> {listing.tripDate}</p>
-                <p><strong>Meet-up Location:</strong> {listing.meetLocation}</p>
-                <p><strong>Destination:</strong> {listing.destination}</p>
-                <p><strong>Status:</strong> {listing.status}</p>
+                <p><strong>Type:</strong> {l.type}</p>
+                <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
+                <p><strong>Destination:</strong> {l.destination}</p>
+                <p><strong>Status:</strong> {l.status}</p>
               </div>
             ))}
             {pendingListings.length === 0 && <p>No pending listings found.</p>}
@@ -638,13 +670,13 @@ export default function Account() {
 
         {activeTab === 'accepted' && (
           <div className="grid">
-            {acceptedListings.map(listing => (
-              <div key={listing.id} className="card">
-                <p><strong>Type:</strong> {listing.type}</p>
-                <p><strong>Trip Date:</strong> {listing.tripDate}</p>
-                <p><strong>Meet-up Location:</strong> {listing.meetLocation}</p>
-                <p><strong>Destination:</strong> {listing.destination}</p>
-                <p><strong>Status:</strong> {listing.status}</p>
+            {acceptedListings.map(l => (
+              <div key={l.id} className="card">
+                <p><strong>Type:</strong> {l.type}</p>
+                <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
+                <p><strong>Destination:</strong> {l.destination}</p>
+                <p><strong>Status:</strong> {l.status}</p>
               </div>
             ))}
             {acceptedListings.length === 0 && <p>No accepted listings found.</p>}
@@ -653,13 +685,13 @@ export default function Account() {
 
         {activeTab === 'completed' && (
           <div className="grid">
-            {completedListings.map(listing => (
+            {completedListings.map(l => (
               <div key={listing.id} className="card">
-                <p><strong>Type:</strong> {listing.type}</p>
-                <p><strong>Trip Date:</strong> {listing.tripDate}</p>
-                <p><strong>Meet-up Location:</strong> {listing.meetLocation}</p>
-                <p><strong>Destination:</strong> {listing.destination}</p>
-                <p><strong>Status:</strong> {listing.status}</p>
+                <p><strong>Type:</strong> {l.type}</p>
+                <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
+                <p><strong>Destination:</strong> {l.destination}</p>
+                <p><strong>Status:</strong> {l.status}</p>
               </div>
             ))}
             {completedListings.length === 0 && <p>No completed listings found.</p>}
