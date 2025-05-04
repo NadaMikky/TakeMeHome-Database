@@ -46,7 +46,18 @@ export default function Account() {
 
   // Add validation functions for payment fields
   const validateCardNumber = (cardNumber) => /^\d{16}$/.test(cardNumber);
-  const validateExpirationDate = (expirationDate) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(expirationDate);
+  const validateExpirationDate = (expirationDate) => {
+    const regex = /^(0[1-9]|1[0-2])\/\d{2}$/; // MM/YY format
+    if (!regex.test(expirationDate)) return false;
+
+    const [month, year] = expirationDate.split('/').map(Number);
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100; // Get last two digits of the year
+    const currentMonth = currentDate.getMonth() + 1;
+
+    // Ensure the date is in the future
+    return year > currentYear || (year === currentYear && month >= currentMonth);
+  };
   const validateCVV = (cvv) => /^\d{3,4}$/.test(cvv);
 
   // Add validation functions for vehicle fields
@@ -58,7 +69,8 @@ export default function Account() {
 
   // Add validation functions for driver fields
   const validateInsuranceCompany = (value) => /^[A-Za-z\s]+$/.test(value); // Letters and spaces only
-  const validateLicenseNumber = (licenseNumber) => /^\d+$/.test(licenseNumber); // Numbers only
+  const validateLicenseNumber = (licenseNumber) =>
+    /^[A-Za-z0-9]{7,14}$/.test(licenseNumber); // Alphanumeric, 7-14 characters
 
   // Fetch user and any relevant data on load
   useEffect(() => {
@@ -257,7 +269,7 @@ export default function Account() {
       return;
     }
     if (!validateExpirationDate(payment.expirationDate)) {
-      alert('Expiration date must be in MM/YY format.');
+      alert('Expiration date must be in MM/YY format and in the future.');
       return;
     }
     if (!validateCVV(payment.cvv)) {
@@ -291,11 +303,9 @@ export default function Account() {
 
     // Validate driver fields
     if (!validateLicenseNumber(driverInfo.licenseNumber)) {
-      alert('License number must be numeric.');
-      return;
-    }
-    if (!validateInsuranceCompany(driverInfo.insuranceCompany)) {
-      alert('Insurance company must contain only letters and spaces.');
+      alert(
+        'License number must be alphanumeric, 7 to 14 characters, and cannot contain special characters.'
+      );
       return;
     }
 

@@ -24,6 +24,13 @@ export default function CreateAccount() {
       classYear,
     };
 
+    // Validate student ID
+    if (!/^\d{9}$/.test(studentID)) {
+      alert('Student ID must be exactly 9 numeric digits.');
+      return;
+    }
+
+    // Validate email
     if (!email.endsWith('@mix.wvu.edu')) {
       alert('Email must end with @mix.wvu.edu.');
       return;
@@ -33,22 +40,21 @@ export default function CreateAccount() {
     try {
       const response = await fetch('http://localhost:8081/api/createAccount', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
-     });
+      });
 
       // Check if the response is ok
       if (response.ok) {
         console.log('Account created successfully:', { firstName, lastName, email });
         navigate('/home'); // Redirect to the home page after successful validation
-      }
-      else {
+      } else {
         console.error('Failed to create account');
       }
     } catch (err) {
       console.error('Error:', err);
     }
-    };
+  };
 
   return (
     <div
@@ -56,7 +62,7 @@ export default function CreateAccount() {
       style={{ backgroundImage: `url(${backgroundImage})` }} // Dynamically set the background image
     >
       <form id="signup-form" onSubmit={handleSubmit}>
-      <input
+        <input
           type="text"
           id="studentID"
           placeholder="Student ID"
