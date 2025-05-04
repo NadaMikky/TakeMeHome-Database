@@ -350,3 +350,59 @@ app.post('/api/listings', (req, res) => {
         });
     }
 });
+
+// Get all listings
+app.get('/api/listings', (req, res) => {
+    const offerQuery = `SELECT 'offer' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, d.Student_ID AS Driver_ID
+        FROM Ride_Offer r
+        JOIN Driver d ON r.Driver_ID = d.Student_ID
+        WHERE r.Trip_Date >= CURDATE()`;
+
+    const requestQuery = `SELECT 'request' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, p.Student_ID AS Passenger_ID
+        FROM Ride_Request r
+        LEFT JOIN Passenger p ON r.Passenger_ID = p.Student_ID
+        WHERE r.Trip_Date >= CURDATE()`;
+
+    db.query(`${offerQuery} UNION ${requestQuery}`, (err, result) => {
+        if (err) {
+            console.error('Error fetching listings:', err);
+            return res.status(500).json({ message: 'Error fetching listings' });
+        }
+        return res.status(200).json({ listings: result });
+    });
+});
+
+// Accept a ride
+app.post('/api/listings/accept', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const studentID = req.session.user.Student_ID;
+    const { listingID, type } = req.body;
+
+    if (!type || !listingID) {
+        return res.status(400).json({ message: 'Missing listing type or ID' });
+    }
+
+    let query = '';
+    let params = [];
+
+    if (type === 'offer') {
+        query = 'UPDATE Ride_Offer SET Passenger_ID = ? WHERE ID_Number = ?';
+        params = [studentID, listingID];
+    } else if (type === 'request') {
+        query = 'UPDATE Ride_Request SET Driver_ID = ? WHERE ID_Number = ?';
+        params = [studentID, listingID];
+    } else {
+        return res.status(400).json({ message: 'Invalid listing type' });
+    }
+
+    db.query(query, params, (err) => {
+        if (err) {
+            console.error('Error accepting ride:', err);
+            return res.status(500).json({ message: 'Error accepting ride' });
+        }
+        return res.status(200).json({ message: 'Ride accepted successfully' });
+    });
+});

@@ -11,7 +11,8 @@ export default function Listings() {
   const [meetLocation, setMeetLocation] = useState('');
   const [licensePlate, setLicensePlate] = useState('');
   const [minTime, setMinTime]           = useState('00:00');
-  const [showForm, setShowForm]       = useState(false);
+  const [showForm, setShowForm]         = useState(false);
+  const [listings, setListings]         = useState([]);
 
   // Today's date in YYYY-MM-DD for the date picker min
   const todayString = new Date().toISOString().slice(0, 10);
@@ -27,6 +28,28 @@ export default function Listings() {
       setMinTime('00:00');
     }
   }, [tripDate, todayString]);
+
+  // Fetch listings from the server
+  useEffect(() => {
+    async function fetchListings() {
+      try {
+        const resp = await fetch('http://localhost:8081/api/listings', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          setListings(data.listings);
+        } else {
+          console.error('Failed to fetch listings:', data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching listings:', err);
+      }
+    }
+
+    fetchListings();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +79,29 @@ export default function Listings() {
         console.log('Failed to create listing', data);
     } catch (error) {
       console.error('Error creating listing:', error);
+    }
+  };
+
+  const handleAccept = async (listing) => {
+    try {
+      const response = await fetch('http://localhost:8081/api/listings/accept', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json',},
+        credentials: 'include',
+        body: JSON.stringify({
+          listingID: listing.ID_Number,
+          type: listing.type
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Listing accepted:', data);
+      } else {
+        console.error('Failed to accept listing:', data.message);
+      }
+    } catch (error) {
+      console.error('Error accepting listing:', error);
     }
   };
 
@@ -145,27 +191,32 @@ export default function Listings() {
         <section style={{ marginTop: '60px' }}>
           <h3>Available Listings</h3>
 
-          <div className="listing-card">
-            <div className="listing-header">
-              <h3>Morgantown to Pittsburgh</h3>
-            </div>
-            <p><strong>Driver:</strong> A</p>
-            <p><strong>Date:</strong> April 25, 2025</p>
-            <p><strong>Time:</strong> 10:30 AM</p>
-            <p><strong>Meet-up Location:</strong> Evansdale Library</p>
-            <button className="btn">Accept</button>
-          </div>
+          {listings
+            .filter(listing => {
+              if (listing.type === 'offer') {
+                return listing.Passenger_ID === '0' || !listing.Passenger_ID;
+              } else {
+                return listing.Driver_ID === '0' || !listing.Driver_ID;
+              }
+            })
+            .map((listing) => (
+            <div key={`${listing.type}-${listing.ID_Number}`} className="listing-card">
+              <div className="listing-header">
+                <h3>{listing.Destination}</h3>
+              </div>
+              <p><strong>{listing.type === 'offer' ? 'Driver' : 'Passenger'}:</strong> {listing.type === 'offer' ? listing.Driver_ID : listing.Passenger_ID}</p>
+              <p><strong>Date:</strong> {listing.Trip_Date}</p>
+              <p><strong>Time:</strong> {listing.Meet_up_Time}</p>
+              <p><strong>Meet-up Location:</strong> {listing.Meet_up_Location}</p>
 
-          <div className="listing-card">
-            <div className="listing-header">
-              <h3>Morgantown to Charleston</h3>
+              <div className="listing-type">
+                {listing.type === 'offer' ? 'Offer' : 'Request'}
+              </div>
+
+              <button className="btn" onClick={() => handleAccept(listing)}>Accept</button>
             </div>
-            <p><strong>Rider:</strong> B</p>
-            <p><strong>Date:</strong> April 28, 2025</p>
-            <p><strong>Time:</strong> 3:45 PM</p>
-            <p><strong>Meet-up Location:</strong> Mountainlair</p>
-            <button className="btn">Accept</button>
-          </div>
+          ))}
+
         </section>
       </main>
     </div>
