@@ -703,7 +703,7 @@ export default function Account() {
                 <h3>{l.destination}</h3>
                 <p><strong>Driver:</strong> {l.driverId && l.driverId !== '0' ? l.driverId : 'No driver assigned yet'}</p>
                 <p><strong>Passenger:</strong> {l.passengerId && l.passengerId !== '0' ? l.passengerId : 'No passenger assigned yet'}</p>
-                <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Trip Date:</strong> {l.tripDate?.slice(0, 10)}</p>
                 <p><strong>Time:</strong> {l.time}</p>
                 <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
                 <p><strong>Status:</strong> {l.status}</p>
@@ -723,7 +723,7 @@ export default function Account() {
                 <h3>{l.destination}</h3>
                 <p><strong>Driver:</strong> {l.driverId && l.driverId !== '0' ? l.driverId : 'No driver assigned yet'}</p>
                 <p><strong>Passenger:</strong> {l.passengerId && l.passengerId !== '0' ? l.passengerId : 'No passenger assigned yet'}</p>
-                <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Trip Date:</strong> {l.tripDate?.slice(0, 10)}</p>
                 <p><strong>Time:</strong> {l.time}</p>
                 <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
                 <p><strong>Status:</strong> {l.status}</p>
@@ -743,7 +743,7 @@ export default function Account() {
                 <h3>{l.destination}</h3>
                 <p><strong>Driver:</strong> {l.driverId && l.driverId !== '0' ? l.driverId : 'No driver assigned yet'}</p>
                 <p><strong>Passenger:</strong> {l.passengerId && l.passengerId !== '0' ? l.passengerId : 'No passenger assigned yet'}</p>
-                <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Trip Date:</strong> {l.tripDate?.slice(0, 10)}</p>
                 <p><strong>Time:</strong> {l.time}</p>
                 <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
                 <p><strong>Status:</strong> {l.status}</p>

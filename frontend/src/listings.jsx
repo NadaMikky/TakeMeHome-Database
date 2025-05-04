@@ -211,7 +211,7 @@ export default function Listings() {
                 <h3>{listing.Destination}</h3>
               </div>
               <p><strong>{listing.type === 'offer' ? 'Driver' : 'Passenger'}:</strong> {listing.type === 'offer' ? listing.Driver_ID : listing.Passenger_ID}</p>
-              <p><strong>Date:</strong> {listing.Trip_Date}</p>
+              <p><strong>Date:</strong> {listing.Trip_Date?.slice(0, 10)}</p>
               <p><strong>Time:</strong> {listing.Meet_up_Time}</p>
               <p><strong>Meet-up Location:</strong> {listing.Meet_up_Location}</p>
 
