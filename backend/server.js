@@ -353,14 +353,14 @@ app.post('/api/listings', (req, res) => {
 
 // Get all listings
 app.get('/api/listings', (req, res) => {
-    const offerQuery = `SELECT 'offer' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, d.Student_ID AS Driver_ID
+    const offerQuery = `SELECT 'offer' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, d.Student_ID AS Driver_ID, 'No passenger assigned' AS Passenger_ID
         FROM Ride_Offer r
         JOIN Driver d ON r.Driver_ID = d.Student_ID
         WHERE r.Trip_Date >= CURDATE()`;
 
-    const requestQuery = `SELECT 'request' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, p.Student_ID AS Passenger_ID
+    const requestQuery = `SELECT 'request' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, r.Passenger_ID, 'No driver assigned' AS Driver_ID
         FROM Ride_Request r
-        LEFT JOIN Passenger p ON r.Passenger_ID = p.Student_ID
+        LEFT JOIN Driver d ON r.Driver_ID = d.Student_ID
         WHERE r.Trip_Date >= CURDATE()`;
 
     db.query(`${offerQuery} UNION ${requestQuery}`, (err, result) => {

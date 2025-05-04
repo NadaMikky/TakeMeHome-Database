@@ -192,13 +192,6 @@ export default function Listings() {
           <h3>Available Listings</h3>
 
           {listings
-            .filter(listing => {
-              if (listing.type === 'offer') {
-                return listing.Passenger_ID === '0' || !listing.Passenger_ID;
-              } else {
-                return listing.Driver_ID === '0' || !listing.Driver_ID;
-              }
-            })
             .map((listing) => (
             <div key={`${listing.type}-${listing.ID_Number}`} className="listing-card">
               <div className="listing-header">
