@@ -55,8 +55,12 @@ export default function Account() {
     const currentYear = currentDate.getFullYear() % 100; // Get last two digits of the year
     const currentMonth = currentDate.getMonth() + 1;
 
-    // Ensure the date is in the future
-    return year > currentYear || (year === currentYear && month >= currentMonth);
+    // Ensure the date is in the future and within a reasonable range (e.g., 10 years)
+    const maxFutureYear = (currentDate.getFullYear() + 10) % 100; // Last two digits of the year 10 years from now
+    return (
+      (year > currentYear || (year === currentYear && month >= currentMonth)) &&
+      year <= maxFutureYear
+    );
   };
   const validateCVV = (cvv) => /^\d{3,4}$/.test(cvv);
 
@@ -269,7 +273,7 @@ export default function Account() {
       return;
     }
     if (!validateExpirationDate(payment.expirationDate)) {
-      alert('Expiration date must be in MM/YY format and in the future.');
+      alert('Expiration date must be in MM/YY format and in the future (Max 10 years).');
       return;
     }
     if (!validateCVV(payment.cvv)) {
