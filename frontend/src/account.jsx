@@ -508,12 +508,28 @@ export default function Account() {
               />
 
               <label>Allow Smoking:</label>
-              <input
-                type="checkbox"
-                name="allowSmoking"
-                checked={driverInfo.allowSmoking}
-                onChange={handleDriverChange}
-              />
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="allowSmoking"
+                    value="true"
+                    checked={driverInfo.allowSmoking === true}
+                    onChange={() => setDriverInfo((d) => ({ ...d, allowSmoking: true }))}
+                  />
+                  Yes
+                </label>
+                <label style={{ marginLeft: '10px' }}>
+                  <input
+                    type="radio"
+                    name="allowSmoking"
+                    value="false"
+                    checked={driverInfo.allowSmoking === false}
+                    onChange={() => setDriverInfo((d) => ({ ...d, allowSmoking: false }))}
+                  />
+                  No
+                </label>
+              </div>
 
               <label>Insurance Company:</label>
               <input
