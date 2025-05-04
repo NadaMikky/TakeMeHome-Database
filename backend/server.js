@@ -378,6 +378,35 @@ app.post('/api/listings/accept', (req, res) => {
     });
 });
 
+// Delete a listing
+app.delete('/api/listings/:type/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { type, id } = req.params;
+
+    // Validate the type parameter
+    if (type !== 'offer' && type !== 'request') {
+        return res.status(400).json({ message: 'Invalid listing type' });
+    }
+    const table = type === 'offer' ? 'Ride_Offer' : 'Ride_Request';
+
+    try {
+        const query = `DELETE FROM ${table} WHERE ID_Number = ?`;
+        const [result] = await db.query(query, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Listing not found' });
+        }
+
+        return res.status(200).json({ message: 'Listing deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting listing:', err);
+        return res.status(500).json({ message: 'Error deleting listing' });
+    }
+});
+
 // User listings
 app.get('/api/user/listings', async (req, res) => {
     if (!req.session.user) {

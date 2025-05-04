@@ -170,6 +170,36 @@ export default function Account() {
   const acceptedListings  = listings.filter(l => l.status === 'accepted');
   const completedListings = listings.filter(l => l.status === 'completed');
 
+  // Delete a listing
+  const handleDeleteListing = async (id, type) => {
+    if (!window.confirm('Are you sure you want to delete this listing?')) {
+      return;
+    }
+
+    try {
+      const resp = await fetch(`http://localhost:8081/api/listings/${type}/${id}`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+      });
+
+      const data = await resp.json();
+
+      if (resp.ok) {
+          alert('Listing deleted successfully');
+          // Remove listing
+          setListings((prevListings) => prevListings.filter((listing) => listing.id !== id));
+      } else {
+          alert(`Error deleting listing: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      alert('Error deleting listing');
+    }
+  };
+
   // Handle passenger form field changes
   const handlePassengerChange = e => {
     const { name, value, type, checked } = e.target;
@@ -709,6 +739,15 @@ export default function Account() {
                 <p><strong>Status:</strong> {l.status}</p>
                 <div className="listing-type-home">
                   {l.type === 'offer' ? 'Offer' : 'Request'}
+                </div>
+                {/* Add delete button */}
+                <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleDeleteListing(l.id, l.type)}
+                >
+                  Delete Listing
+                </button>
                 </div>
               </div>
             ))}
