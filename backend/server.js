@@ -358,9 +358,9 @@ app.get('/api/listings', (req, res) => {
         JOIN Driver d ON r.Driver_ID = d.Student_ID
         WHERE r.Trip_Date >= CURDATE()`;
 
-    const requestQuery = `SELECT 'request' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, r.Passenger_ID, 'No driver assigned' AS Driver_ID
+    const requestQuery = `SELECT 'request' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, COALESCE(r.Driver_ID, 'No driver assigned') AS Driver_ID,
+        r.Passenger_ID AS Passenger_ID
         FROM Ride_Request r
-        LEFT JOIN Driver d ON r.Driver_ID = d.Student_ID
         WHERE r.Trip_Date >= CURDATE()`;
 
     db.query(`${offerQuery} UNION ${requestQuery}`, (err, result) => {

@@ -1,8 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './navbar'; // Import Navbar
 import './home.css'; // Importing CSS for styling
 
 function Home() {
+  const [listings, setListings]         = useState([]);
+
+  // Fetch listings from the server
+    useEffect(() => {
+      async function fetchListings() {
+        try {
+          const resp = await fetch('http://localhost:8081/api/listings', {
+            method: 'GET',
+            credentials: 'include'
+          });
+          const data = await resp.json();
+          if (resp.ok) {
+            setListings(data.listings);
+          } else {
+            console.error('Failed to fetch listings:', data.message);
+          }
+        } catch (err) {
+          console.error('Error fetching listings:', err);
+        }
+      }
+  
+      fetchListings();
+    }, []);
+
   return (
     <div className="home-container"> {/* Add a container to ensure full height */}
       <Navbar /> {/* Add Navbar manually */}
@@ -22,21 +46,21 @@ function Home() {
         <h2>Available Listings</h2> {/* Section title */}
         <div className="listing-grid">
           {/* Example listing card */}
-          <div className="listing-card">
-            <h3>Morgantown to Pittsburgh</h3>
-            <p><strong>Driver:</strong> A</p>
-            <p><strong>Date:</strong> April 25, 2025</p>
-            <p><strong>Time:</strong> 10:30 AM</p>
-            <p><strong>Meet-up Location:</strong> Evansdale Library</p>
+          {listings
+            .map((listing) => (
+            <div key={`${listing.type}-${listing.ID_Number}`} className="listing-card">
+            <h3>{listing.Destination}</h3>
+            <p><strong>{listing.type === 'offer' ? 'Driver' : 'Passenger'}:</strong> {listing.type === 'offer' ? listing.Driver_ID : listing.Passenger_ID}</p>
+              <p><strong>Date:</strong> {listing.Trip_Date}</p>
+              <p><strong>Time:</strong> {listing.Meet_up_Time}</p>
+              <p><strong>Meet-up Location:</strong> {listing.Meet_up_Location}</p>
+
+              <div className="listing-type-home">
+                {listing.type === 'offer' ? 'Offer' : 'Request'}
+              </div>
           </div>
-          {/* Example listing card */}
-          <div className="listing-card">
-            <h3>Morgantown to Charleston</h3>
-            <p><strong>Rider:</strong> B</p>
-            <p><strong>Date:</strong> April 28, 2025</p>
-            <p><strong>Time:</strong> 3:45 PM</p>
-            <p><strong>Meet-up Location:</strong> Mountainlair</p>
-          </div>
+          ))}
+          
         </div>
       </section>
     </div>
