@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const mysql = require('mysql2');
+const db = require('./db');
 const cors = require('cors');
 
 const app = express();
@@ -34,38 +34,38 @@ app.post('/api/logout', (req, res) => {
 });
 
 //database connection
-const db = mysql.createConnection({
-    host: 'mysql-edcf05-take-me-home.l.aivencloud.com',
-    port: 15398,
-    user: 'avnadmin',
-    password: 'AVNS_CPA5OmNrKwBD2xMko_a',
-    database: 'defaultdb',
-    ssl: {
-        rejectUnauthorized: false // optional, but recommended
-    }
-});
-// subject to be removed 
-function handleDisconnect() {
-    db.connect(err => {
-        if (err) {
-            console.error('Error reconnecting to the database:', err);
-           process.exit(1); 
-        } else {
-            console.log('Reconnected to the database.');
-        }
-    });
+// const db = mysql.createConnection({
+//     host: 'mysql-edcf05-take-me-home.l.aivencloud.com',
+//     port: 15398,
+//     user: 'avnadmin',
+//     password: 'AVNS_CPA5OmNrKwBD2xMko_a',
+//     database: 'defaultdb',
+//     ssl: {
+//         rejectUnauthorized: false // optional, but recommended
+//     }
+// });
+// // subject to be removed 
+// function handleDisconnect() {
+//     db.connect(err => {
+//         if (err) {
+//             console.error('Error reconnecting to the database:', err);
+//            process.exit(1); 
+//         } else {
+//             console.log('Reconnected to the database.');
+//         }
+//     });
 
-    db.on('error', err => {
-        console.error('Database error:', err);
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            handleDisconnect(); // Reconnect if the connection is lost
-        } else {
-            throw err;
-        }
-    });
-}
+//     db.on('error', err => {
+//         console.error('Database error:', err);
+//         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+//             handleDisconnect(); // Reconnect if the connection is lost
+//         } else {
+//             throw err;
+//         }
+//     });
+// }
 
-handleDisconnect();
+// handleDisconnect();
 
 // Database Queries
 
@@ -74,37 +74,37 @@ app.get('/', (req, res) => {
 });
 
 // Add User to database
-app.post('/api/createAccount', (req, res) => {
+app.post('/api/createAccount', async (req, res) => {
     const { studentID, firstName, lastName, email, password, classYear } = req.body;
   
     const sql = 'INSERT INTO Users (Student_ID, First_Name, Last_Name, Email, Password, Class) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(sql, [studentID, firstName, lastName, email, password, classYear], (err, result) => {
-      if (err) {
+    try {
+        await db.query(sql, [studentID, firstName, lastName, email, password, classYear]);
+        return res.status(201).json({ message: 'User created successfully' });
+    } catch (err) {
         console.error('Error inserting user:', err);
         return res.status(500).json({ message: 'Error creating user' });
-      }
-      return res.status(201).json({ message: 'User created successfully' });
-    });
+    }
   });
 
   // Login User
-  app.post('/api/login', (req, res) => {
+  app.post('/api/login', async (req, res) => {
     const {email, password } = req.body;
     const sql = 'SELECT * FROM Users WHERE Email = ? AND Password = ?';
 
-    db.query(sql, [email, password], (err, result) => {
-    if (err) {
-      console.error('Error during login:', err);
-      return res.status(500).json({ message: 'Internal server error' });
-    }
+    try {
+        const [result] = await db.query(sql, [email, password]);
 
-    if (result.length > 0) {
-      req.session.user = result[0];
-      return res.status(200).json({ message: 'Login successful', user: result[0] });
-    } else {
-      return res.status(401).json({ message: 'Invalid email or password' });
+        if (result.length > 0) {
+            req.session.user = result[0];
+            return res.status(200).json({ message: 'Login successful', user: result[0] });
+        } else {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (err) {
+        console.error('Error during login:', err);
+        return res.status(500).json({ message: 'Internal server error' });
     }
-    });
 });
 
 // Verify if user is logged in
@@ -116,19 +116,23 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-app.get('/Users', (req, res) => {
-    const sql = 'SELECT * FROM Users'
-    db.query(sql, (err, result) => {
-        if (err) return res.json(err)
-        return res.json(result)
-    })
-})
-    app.listen(8081, () => {
-        console.log('Listening');
-    });
+app.get('/api/users', async (req, res) => {
+    const sql = 'SELECT * FROM Users';
+    try {
+        const [rows] = await db.query(sql);
+        return res.status(200).json(rows);
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        return res.status(500).json({ message: 'Error fetching users' });
+    }
+});
+
+app.listen(8081, () => {
+    console.log('Listening');
+});
 
 // Add Passenger to database
-app.post('/api/passenger', (req, res) => {
+app.post('/api/passenger', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -138,12 +142,9 @@ app.post('/api/passenger', (req, res) => {
 
     const paymentValue = payment || (req.session.user.payment?.paymentMethod || 'Unknown');
 
-    const sql = 'SELECT * FROM Passenger WHERE Student_ID = ?';
-    db.query(sql, [studentID], (err, result) => {
-        if (err) {
-            console.error('Error checking passenger:', err);
-            return res.status(500).json({ message: 'Error checking passenger' });
-        }
+    try {
+        // Check if passenger already exists
+        const [result] = await db.query('SELECT * FROM Passenger WHERE Student_ID = ?', [studentID]);
 
         const query = result.length > 0
             ? 'UPDATE Passenger SET Has_Luggage = ?, Payment = ? WHERE Student_ID = ?'
@@ -153,21 +154,21 @@ app.post('/api/passenger', (req, res) => {
             ? [hasLuggage, paymentValue, studentID]
             : [studentID, hasLuggage, paymentValue];
 
-        db.query(query, params, (err2)  => {
-            if (err2) {
-                console.error('Error inserting/updating passenger:', err2);
-                return res.status(500).json({ message: 'Error inserting/updating passenger' });
-            }
+        // Insert or Update Passenger
+        await db.query(query, params);
 
-            const updatedPassenger = { hasLuggage, payment: paymentValue }
-            req.session.user.passenger = updatedPassenger; // Update session with passenger info
-            return res.status(200).json({ message: 'Passenger information saved successfully' });
-        });
-    });
+        const updatedPassenger = { hasLuggage, payment: paymentValue };
+        req.session.user.passenger = updatedPassenger; // Update session with passenger info
+        return res.status(200).json({ message: 'Passenger information saved successfully' });
+
+    } catch (err) {
+        console.error('Error inserting/updating passenger:', err);
+        return res.status(500).json({ message: 'Error inserting/updating passenger' });
+    }
 });
 
 // Add Driver to database
-app.post('/api/driver', (req, res) => {
+app.post('/api/driver', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -175,12 +176,9 @@ app.post('/api/driver', (req, res) => {
     const studentID = req.session.user.Student_ID;
     const { licenseNumber, allowSmoking, insuranceCompany } = req.body;
 
-    const sql = 'SELECT * FROM Driver WHERE Student_ID = ?';
-    db.query(sql, [studentID], (err, result) => {
-        if (err) {
-            console.error('Error checking driver:', err);
-            return res.status(500).json({ message: 'Error checking driver' });
-        }
+    try {
+        // Check if driver already exists
+        const [result] = await db.query('SELECT * FROM Driver WHERE Student_ID = ?', [studentID]);
 
         const query = result.length > 0
             ? 'UPDATE Driver SET License_Number = ?, Allow_Smoking = ?, Insurance_Company = ? WHERE Student_ID = ?'
@@ -189,21 +187,22 @@ app.post('/api/driver', (req, res) => {
         const params = result.length > 0
             ? [licenseNumber, allowSmoking, insuranceCompany, studentID]
             : [studentID, licenseNumber, allowSmoking, insuranceCompany];
-        db.query(query, params, (err2) => {
-            if (err2) {
-                console.error('Error inserting/updating driver:', err2);
-                return res.status(500).json({ message: 'Error inserting/updating driver' });
-            }
 
-            const updatedDriver = { licenseNumber, allowSmoking, insuranceCompany }
-            req.session.user.driver = updatedDriver; // Update session with driver info
-            return res.status(200).json({ message: 'Driver information saved successfully' });
-        });
-    });
+        // Insert or Update Driver
+        await db.query(query, params);
+
+        const updatedDriver = { licenseNumber, allowSmoking, insuranceCompany };
+        req.session.user.driver = updatedDriver; // Update session with driver info
+        return res.status(200).json({ message: 'Driver information saved successfully' });
+
+    } catch (err) {
+        console.error('Error inserting/updating driver:', err);
+        return res.status(500).json({ message: 'Error inserting/updating driver' });
+    }
 });
 
 // Add Payment to database
-app.post('/api/payment', (req, res) => {
+app.post('/api/payment', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -211,12 +210,9 @@ app.post('/api/payment', (req, res) => {
     const studentID = req.session.user.Student_ID;
     const { paymentMethod, cardNumber, expirationDate, cvv } = req.body;
 
-    const sql = 'SELECT * FROM Payment_Info WHERE ID_Number = ?';
-    db.query(sql, [studentID], (err, result) => {
-        if (err) {
-            console.error('Error checking payment:', err);
-            return res.status(500).json({ message: 'Error checking payment' });
-        }
+    try {
+        // Check if payment info already exists
+        const [result] = await db.query('SELECT * FROM Payment_Info WHERE ID_Number = ?', [studentID]);
 
         const query = result.length > 0
             ? 'UPDATE Payment_Info SET Payment_Method = ?, Card_Number = ?, Expiration_Date = ?, CVV = ? WHERE ID_Number = ?'
@@ -226,30 +222,25 @@ app.post('/api/payment', (req, res) => {
             ? [paymentMethod, cardNumber, expirationDate, cvv, studentID]
             : [studentID, paymentMethod, cardNumber, expirationDate, cvv];
 
-        db.query(query, params, (err2) => {
-            if (err2) {
-                console.error('Error inserting/updating payment:', err2);
-                return res.status(500).json({ message: 'Error inserting/updating payment' });
-            }
+        await db.query(query, params);
 
-            // Add to passenger table if exists
-            const updatePassenger = 'UPDATE Passenger SET Payment = ? WHERE Student_ID = ?';
-            db.query(updatePassenger, [paymentMethod, studentID], (err3) => {
-                if (err3) {
-                    console.error('Error updating passenger with payment:', err3);
-                    return res.status(500).json({ message: 'Error updating passenger with payment' });
-                }
-            });
+        // Try updating Passenger table if the user is a passenger
+        await db.query('UPDATE Passenger SET Payment = ? WHERE Student_ID = ?', [paymentMethod, studentID]);
 
-            const updatedPayment = { paymentMethod, cardNumber, expirationDate, cvv }
-            req.session.user.payment = updatedPayment; // Update session with payment info
-            return res.status(200).json({ message: 'Payment information saved successfully' });
-        });
-    });
+        // Update session
+        const updatedPayment = { paymentMethod, cardNumber, expirationDate, cvv };
+        req.session.user.payment = updatedPayment;
+
+        return res.status(200).json({ message: 'Payment information saved successfully' });
+
+    } catch (err) {
+        console.error('Error inserting/updating payment:', err);
+        return res.status(500).json({ message: 'Error inserting/updating payment' });
+    }
 });
 
 // Add vehile to database
-app.post('/api/vehicle', (req, res) => {
+app.post('/api/vehicle', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -257,36 +248,32 @@ app.post('/api/vehicle', (req, res) => {
     const studentID = req.session.user.Student_ID;
     const { make, model, year, vin, licensePlate, seatingCapacity } = req.body;
 
-    const sql = 'SELECT * FROM Vehicle WHERE Student_ID = ?';
-    db.query(sql, [studentID], (err, result) => {
-        if (err) {
-            console.error('Error checking vehicle:', err);
-            return res.status(500).json({ message: 'Error checking vehicle' });
-        }
+    try {
+        // Check if a vehicle already exists for this student
+        const [existing] = await db.query('SELECT * FROM Vehicle WHERE Student_ID = ?', [studentID]);
 
-        const query = result.length > 0
+        const query = existing.length > 0
             ? 'UPDATE Vehicle SET Make = ?, Model = ?, Year = ?, VIN = ?, License_Plate = ?, Seating_Capacity = ? WHERE Student_ID = ?'
             : 'INSERT INTO Vehicle (Make, Model, Year, VIN, License_Plate, Seating_Capacity, Student_ID) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
-        const params = result.length > 0
+        const params = existing.length > 0
             ? [make, model, year, vin, licensePlate, seatingCapacity, studentID]
             : [make, model, year, vin, licensePlate, seatingCapacity, studentID];
 
-        db.query(query, params, (err2) => {
-            if (err2) {
-                console.error('Error inserting/updating vehicle:', err2);
-                return res.status(500).json({ message: 'Error inserting/updating vehicle' });
-            }
+        await db.query(query, params);
 
-            const updatedVehicle = { make, model, year, vin, licensePlate, seatingCapacity }
-            req.session.user.vehicle = updatedVehicle; // Update session with vehicle info
-            return res.status(200).json({ message: 'Vehicle information saved successfully' });
-        });
-    });
+        const updatedVehicle = { make, model, year, vin, licensePlate, seatingCapacity };
+        req.session.user.vehicle = updatedVehicle;
+
+        return res.status(200).json({ message: 'Vehicle information saved successfully' });
+    } catch (err) {
+        console.error('Error inserting/updating vehicle:', err);
+        return res.status(500).json({ message: 'Error inserting/updating vehicle' });
+    }
 });
 
 // Add Listing to database
-app.post('/api/listings', (req, res) => {
+app.post('/api/listings', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -294,83 +281,66 @@ app.post('/api/listings', (req, res) => {
     const studentID = req.session.user.Student_ID;
     const { listingType, tripDate, destination, meetTime, meetLocation, licensePlate } = req.body;
 
-    if (listingType === 'offer') {
-        // Confirm user is a driver
-        const sqlDriver = 'SELECT * FROM Driver WHERE Student_ID = ?';
-        db.query(sqlDriver, [studentID], (err, result) => {
-            if (err) {
-                console.error('Error checking driver:', err);
-                return res.status(500).json({ message: 'Error checking driver' });
-            }
-
-            if (result.length === 0) {
+    try {
+        if (listingType === 'offer') {
+            const [driver] = await db.query('SELECT * FROM Driver WHERE Student_ID = ?', [studentID]);
+            if (driver.length === 0) {
                 return res.status(400).json({ message: 'User is not a driver' });
             }
 
-            const insertOfferSQL = 
-                'INSERT INTO Ride_Offer (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID) VALUES (?, ?, ?, ?, ?)';
+            const offerSQL = `
+                INSERT INTO Ride_Offer (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID)
+                VALUES (?, ?, ?, ?, ?)
+            `;
             const offerParams = [tripDate, meetLocation, destination, meetTime, studentID];
+            await db.query(offerSQL, offerParams);
 
-            db.query(insertOfferSQL, offerParams, (err2) => {
-                if (err2) {
-                    console.error('Error inserting ride offer:', err2);
-                    return res.status(500).json({ message: 'Error inserting ride offer' });
-                }
+            return res.status(200).json({ message: 'Ride offer created successfully' });
 
-                return res.status(200).json({ message: 'Ride offer created successfully' });
-            });
-        });
-    }
-
-    else if (listingType === 'request') {
-        // Confirm user is a passenger
-        const sqlPassenger = 'SELECT * FROM Passenger WHERE Student_ID = ?';
-        db.query(sqlPassenger, [studentID], (err, result) => {
-            if (err) {
-                console.error('Error checking passenger:', err);
-                return res.status(500).json({ message: 'Error checking passenger' });
-            }
-
-            if (result.length === 0) {
+        } else if (listingType === 'request') {
+            const [passenger] = await db.query('SELECT * FROM Passenger WHERE Student_ID = ?', [studentID]);
+            if (passenger.length === 0) {
                 return res.status(400).json({ message: 'User is not a passenger' });
             }
 
-            const insertRequestSQL = 
-                'INSERT INTO Ride_Request (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Passenger_ID) VALUES (?, ?, ?, ?, ?)';
+            const requestSQL = `
+                INSERT INTO Ride_Request (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Passenger_ID)
+                VALUES (?, ?, ?, ?, ?)
+            `;
             const requestParams = [tripDate, meetLocation, destination, meetTime, studentID];
+            await db.query(requestSQL, requestParams);
 
-            db.query(insertRequestSQL, requestParams, (err2) => {
-                if (err2) {
-                    console.error('Error inserting ride request:', err2);
-                    return res.status(500).json({ message: 'Error inserting ride request' });
-                }
-
-                return res.status(200).json({ message: 'Ride request created successfully' });
-            });
-        });
+            return res.status(200).json({ message: 'Ride request created successfully' });
+        } else {
+            return res.status(400).json({ message: 'Invalid listing type' });
+        }
+    } catch (err) {
+        console.error('Error processing listing:', err);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 // Get all listings
-app.get('/api/listings', (req, res) => {
+app.get('/api/listings', async (req, res) => {
     // Offer and request listings
-    const offerQuery = `SELECT 'offer' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, d.Student_ID AS Driver_ID, 'No passenger assigned' AS Passenger_ID
+    const offerQuery = `SELECT 'offer' AS type, r.ID_Number, DATE(r.Trip_Date) AS Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, d.Student_ID AS Driver_ID, 'No passenger assigned' AS Passenger_ID
         FROM Ride_Offer r
         JOIN Driver d ON r.Driver_ID = d.Student_ID
         WHERE r.Trip_Date >= CURDATE()`;
 
-    const requestQuery = `SELECT 'request' AS type, r.ID_Number, r.Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, COALESCE(r.Driver_ID, 'No driver assigned') AS Driver_ID,
+    const requestQuery = `SELECT 'request' AS type, r.ID_Number, DATE(r.Trip_Date) AS Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time, COALESCE(r.Driver_ID, 'No driver assigned') AS Driver_ID,
         r.Passenger_ID AS Passenger_ID
         FROM Ride_Request r
         WHERE r.Trip_Date >= CURDATE()`;
 
-    db.query(`${offerQuery} UNION ${requestQuery}`, (err, result) => {
-        if (err) {
+        try {
+            const combinedQuery = `${offerQuery} UNION ${requestQuery}`;
+            const [rows] = await db.query(combinedQuery);
+            return res.status(200).json({ listings: rows });
+        } catch (err) {
             console.error('Error fetching listings:', err);
             return res.status(500).json({ message: 'Error fetching listings' });
         }
-        return res.status(200).json({ listings: result });
-    });
 });
 
 // Accept a ride
@@ -409,28 +379,74 @@ app.post('/api/listings/accept', (req, res) => {
 });
 
 // User listings
-app.get('/api/user/listings', (req, res) => {
-    const userId = req.session.user?.Student_ID;
-  
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
+app.get('/api/user/listings', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
-  
-    const sql = `
-      SELECT 'offer' AS type, ID_Number, Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID, NULL AS Passenger_ID
-      FROM Ride_Offer
-      WHERE Driver_ID = ?
-      UNION
-      SELECT 'request' AS type, ID_Number, Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID, Passenger_ID
-      FROM Ride_Request
-      WHERE Passenger_ID = ?
-    `;
-  
-    db.query(sql, [userId, userId], (err, results) => {
-      if (err) {
+
+    const studentID = req.session.user.Student_ID;
+
+    try {
+        const offerQuery = `
+            SELECT 'offer' AS type, r.ID_Number, DATE(r.Trip_Date) AS Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time,
+                   r.Driver_ID, r.Passenger_ID
+            FROM Ride_Offer r
+            WHERE r.Driver_ID = ? OR r.Passenger_ID = ?
+        `;
+        const requestQuery = `
+            SELECT 'request' AS type, r.ID_Number, DATE(r.Trip_Date) AS Trip_Date, r.Meet_up_Location, r.Destination, r.Meet_up_Time,
+                   r.Driver_ID, r.Passenger_ID
+            FROM Ride_Request r
+            WHERE r.Passenger_ID = ? OR r.Driver_ID = ?
+        `;
+
+        const [offers] = await db.query(offerQuery, [studentID, studentID]);
+        const [requests] = await db.query(requestQuery, [studentID, studentID]);
+
+        const listings = [...offers, ...requests];
+        return res.status(200).json({ listings });
+
+    } catch (err) {
         console.error('Error fetching user listings:', err);
-        return res.status(500).json({ message: 'Error fetching user listings' });
-      }
-      res.status(200).json({ listings: results });
-    });
+        return res.status(500).json({ message: 'Failed to fetch user listings' });
+    }
+});
+
+  // Delete User
+  app.delete('/api/user', async (req, res) => {
+    const studentId = req.session.user?.Student_ID;
+    if (!studentId) return res.status(401).json({ message: 'Unauthorized' });
+  
+    let conn;
+    try {
+      conn = await db.getConnection();
+      await conn.beginTransaction();
+  
+      // Deletion order matters due to foreign key constraints
+      await conn.query('DELETE FROM Payment_Info WHERE ID_Number = ?', [studentId]);
+      await conn.query('DELETE FROM Ride_Request WHERE Passenger_ID = ? OR Driver_ID = ?', [studentId, studentId]);
+      await conn.query('DELETE FROM Ride_Offer WHERE Passenger_ID = ? OR Driver_ID = ?', [studentId, studentId]);
+      await conn.query('DELETE FROM Vehicle WHERE Student_ID = ?', [studentId]);
+      await conn.query('DELETE FROM Passenger WHERE Student_ID = ?', [studentId]);
+      await conn.query('DELETE FROM Driver WHERE Student_ID = ?', [studentId]);
+      await conn.query('DELETE FROM Users WHERE Student_ID = ?', [studentId]);
+  
+      await conn.commit();
+  
+      // Ensure session is destroyed before sending response
+      req.session.destroy(err => {
+        if (err) {
+          console.error('Session destroy failed:', err);
+          return res.status(500).json({ message: 'Account deleted, but session cleanup failed' });
+        }
+        return res.json({ message: 'Account deleted successfully' });
+      });
+    } catch (err) {
+      if (conn) await conn.rollback();
+      console.error('Delete failed:', err);
+      return res.status(500).json({ message: 'Failed to delete user' });
+    } finally {
+      if (conn) conn.release();
+    }
   });
+  

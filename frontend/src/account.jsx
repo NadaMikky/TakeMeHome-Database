@@ -94,9 +94,11 @@ export default function Account() {
             if (new Date(tripDate) < new Date()) {
               status = 'completed';
             } else if (l.type === 'offer') {
-              status = driverId && driverId !== 0 ? 'accepted' : 'pending';
-            } else /* 'request' */ {
-              status = passengerId && passengerId !== 0 ? 'accepted' : 'pending';
+              // Check if passenger ID is assigned
+              status = passengerId && passengerId !== '0' ? 'accepted' : 'pending';
+            } else if (l.type === 'request') {
+              // CHeck if driver ID is assigned
+              status = driverId && driverId !== '0' ? 'accepted' : 'pending';
             }
             return {
               id:           l.ID_Number,
@@ -346,6 +348,31 @@ export default function Account() {
         <div className="card user-info-card">
           <p><strong>Email:</strong> {user.Email}</p>
           <p><strong>Class:</strong> {user.Class}</p>
+
+          <button
+            className="btn bth-danger" 
+            onClick={async () => {
+              if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
+            
+              try {
+                const resp = await fetch('http://localhost:8081/api/user', {
+                  method: 'DELETE',
+                  credentials: 'include'
+                });
+                const data = await resp.json();
+                if (resp.ok) {
+                  alert('Account deleted successfully.');
+                  navigate('/'); // Redirect to first page
+                } else {
+                  const data = await resp.json();
+                  setError(data.message || 'Failed to delete account');
+                }
+              } catch {
+                alert('Error deleting account.');
+              }
+            }}>
+              Delete My Account
+          </button>
         </div>
 
         {/* PASSENGER SECTION */}
@@ -672,12 +699,17 @@ export default function Account() {
         {activeTab === 'pending' && (
           <div className="grid">
             {pendingListings.map(l => (
-              <div key={listing.id} className="card">
-                <p><strong>Type:</strong> {l.type}</p>
+              <div key={l.id} className="card">
+                <h3>{l.destination}</h3>
+                <p><strong>Driver:</strong> {l.driverId && l.driverId !== '0' ? l.driverId : 'No driver assigned yet'}</p>
+                <p><strong>Passenger:</strong> {l.passengerId && l.passengerId !== '0' ? l.passengerId : 'No passenger assigned yet'}</p>
                 <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Time:</strong> {l.time}</p>
                 <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
-                <p><strong>Destination:</strong> {l.destination}</p>
                 <p><strong>Status:</strong> {l.status}</p>
+                <div className="listing-type-home">
+                  {l.type === 'offer' ? 'Offer' : 'Request'}
+                </div>
               </div>
             ))}
             {pendingListings.length === 0 && <p>No pending listings found.</p>}
@@ -688,11 +720,16 @@ export default function Account() {
           <div className="grid">
             {acceptedListings.map(l => (
               <div key={l.id} className="card">
-                <p><strong>Type:</strong> {l.type}</p>
+                <h3>{l.destination}</h3>
+                <p><strong>Driver:</strong> {l.driverId && l.driverId !== '0' ? l.driverId : 'No driver assigned yet'}</p>
+                <p><strong>Passenger:</strong> {l.passengerId && l.passengerId !== '0' ? l.passengerId : 'No passenger assigned yet'}</p>
                 <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Time:</strong> {l.time}</p>
                 <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
-                <p><strong>Destination:</strong> {l.destination}</p>
                 <p><strong>Status:</strong> {l.status}</p>
+                <div className="listing-type-home">
+                  {l.type === 'offer' ? 'Offer' : 'Request'}
+                </div>
               </div>
             ))}
             {acceptedListings.length === 0 && <p>No accepted listings found.</p>}
@@ -702,12 +739,17 @@ export default function Account() {
         {activeTab === 'completed' && (
           <div className="grid">
             {completedListings.map(l => (
-              <div key={listing.id} className="card">
-                <p><strong>Type:</strong> {l.type}</p>
+              <div key={l.id} className="card">
+                <h3>{l.destination}</h3>
+                <p><strong>Driver:</strong> {l.driverId && l.driverId !== '0' ? l.driverId : 'No driver assigned yet'}</p>
+                <p><strong>Passenger:</strong> {l.passengerId && l.passengerId !== '0' ? l.passengerId : 'No passenger assigned yet'}</p>
                 <p><strong>Trip Date:</strong> {l.tripDate}</p>
+                <p><strong>Time:</strong> {l.time}</p>
                 <p><strong>Meet-up Location:</strong> {l.meetLocation}</p>
-                <p><strong>Destination:</strong> {l.destination}</p>
                 <p><strong>Status:</strong> {l.status}</p>
+                <div className="listing-type-home">
+                  {l.type === 'offer' ? 'Offer' : 'Request'}
+                </div>
               </div>
             ))}
             {completedListings.length === 0 && <p>No completed listings found.</p>}

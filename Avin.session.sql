@@ -67,7 +67,7 @@
 -- );
 
 -- ALTER TABLE Ride_Request AUTO_INCREMENT = 100000000;
--- ALTER TABLE Ride_Request AUTO_INCREMENT = 600000000;
+-- ALTER TABLE Ride_Offer AUTO_INCREMENT = 600000000;
 -- ALTER TABLE Passenger ADD Payment VARCHAR(20) NOT NULL DEFAULT 'Unknown';
 
 -- INSERT INTO Users
@@ -84,3 +84,6 @@
 -- SELECT * FROM Ride_Request;
 -- SELECT * FROM Ride_Offer;
 -- SELECT * FROM Payment_Info;
+
+-- INSERT INTO Ride_Offer
+-- VALUES ('600000000', '2025-05-03', 'Morgantown, WV', 'Pittsburgh, PA', '08:00:00', '7009988765', '0');
