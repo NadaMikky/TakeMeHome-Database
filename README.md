@@ -16,7 +16,7 @@ This repository contains the structured database for **Take Me Home**, a **WVU-e
 
 ## **Launch the App**
 
-### 1. **Clone the repository**
+### 1. **Open Terminal on VS Code & Clone the repository**
 
 ```bash
 git clone https://github.com/NadaMikky/TakeMeHome-Database.git
