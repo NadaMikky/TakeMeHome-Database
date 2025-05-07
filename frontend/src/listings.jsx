@@ -200,7 +200,7 @@ export default function Listings() {
           
               // For Requests: Check if Driver_ID is '0' (not accepted)
               if (listing.type === 'request') {
-                return listing.Driver_ID === 'No driver assigned';
+                return listing.Driver_ID === '0';
               }
           
               return true; // Default case, just in case
