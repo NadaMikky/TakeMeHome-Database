@@ -53,6 +53,12 @@ export default function Listings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!listingType || !tripDate || !destination || !meetTime || !meetLocation) {
+      console.error('Missing required fields');
+      return;
+    }
+
     const payload = {
       listingType,
       tripDate,
@@ -62,12 +68,15 @@ export default function Listings() {
       ...(listingType === 'offer' && { licensePlate }),
     };
 
+    console.log('Payload being sent:', payload); // Log the payload for debugging
+
     try {
-      const response = await fetch('/api/listings', {
+      const response = await fetch('http://localhost:8081/api/listings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -75,8 +84,9 @@ export default function Listings() {
       if (response.ok) {
         console.log('Listing created:', data);
         setShowForm(false);
-      } else {}
-        console.log('Failed to create listing', data);
+      } else {
+        console.error('Failed to create listing', data);
+      }
     } catch (error) {
       console.error('Error creating listing:', error);
     }

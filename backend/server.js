@@ -240,50 +240,56 @@ app.post('/api/vehicle', async (req, res) => {
 
 // Add Listing to database
 app.post('/api/listings', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ message: 'Unauthorized' });
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  const studentID = req.session.user.Student_ID;
+  const { listingType, tripDate, destination, meetTime, meetLocation, licensePlate } = req.body;
+
+  console.log('Incoming request body:', req.body); // Log the request body for debugging
+
+  if (!listingType || !tripDate || !destination || !meetTime || !meetLocation) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    if (listingType === 'offer') {
+      const [driver] = await db.query('SELECT * FROM Driver WHERE Student_ID = ?', [studentID]);
+      if (driver.length === 0) {
+        return res.status(400).json({ message: 'User is not a driver' });
+      }
+
+      const offerSQL = `
+        INSERT INTO Ride_Offer (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+      const offerParams = [tripDate, meetLocation, destination, meetTime, studentID];
+      await db.query(offerSQL, offerParams);
+
+      return res.status(200).json({ message: 'Ride offer created successfully' });
+
+    } else if (listingType === 'request') {
+      const [passenger] = await db.query('SELECT * FROM Passenger WHERE Student_ID = ?', [studentID]);
+      if (passenger.length === 0) {
+        return res.status(400).json({ message: 'User is not a passenger' });
+      }
+
+      const requestSQL = `
+        INSERT INTO Ride_Request (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Passenger_ID)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+      const requestParams = [tripDate, meetLocation, destination, meetTime, studentID];
+      await db.query(requestSQL, requestParams);
+
+      return res.status(200).json({ message: 'Ride request created successfully' });
+    } else {
+      return res.status(400).json({ message: 'Invalid listing type' });
     }
-
-    const studentID = req.session.user.Student_ID;
-    const { listingType, tripDate, destination, meetTime, meetLocation, licensePlate } = req.body;
-
-    try {
-        if (listingType === 'offer') {
-            const [driver] = await db.query('SELECT * FROM Driver WHERE Student_ID = ?', [studentID]);
-            if (driver.length === 0) {
-                return res.status(400).json({ message: 'User is not a driver' });
-            }
-
-            const offerSQL = `
-                INSERT INTO Ride_Offer (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Driver_ID)
-                VALUES (?, ?, ?, ?, ?)
-            `;
-            const offerParams = [tripDate, meetLocation, destination, meetTime, studentID];
-            await db.query(offerSQL, offerParams);
-
-            return res.status(200).json({ message: 'Ride offer created successfully' });
-
-        } else if (listingType === 'request') {
-            const [passenger] = await db.query('SELECT * FROM Passenger WHERE Student_ID = ?', [studentID]);
-            if (passenger.length === 0) {
-                return res.status(400).json({ message: 'User is not a passenger' });
-            }
-
-            const requestSQL = `
-                INSERT INTO Ride_Request (Trip_Date, Meet_up_Location, Destination, Meet_up_Time, Passenger_ID)
-                VALUES (?, ?, ?, ?, ?)
-            `;
-            const requestParams = [tripDate, meetLocation, destination, meetTime, studentID];
-            await db.query(requestSQL, requestParams);
-
-            return res.status(200).json({ message: 'Ride request created successfully' });
-        } else {
-            return res.status(400).json({ message: 'Invalid listing type' });
-        }
-    } catch (err) {
-        console.error('Error processing listing:', err);
-        return res.status(500).json({ message: 'Internal server error' });
-    }
+  } catch (err) {
+    console.error('Error processing listing:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 // Get all listings
@@ -447,4 +453,4 @@ app.get('/api/user/listings', async (req, res) => {
       if (conn) conn.release();
     }
   });
-  
+

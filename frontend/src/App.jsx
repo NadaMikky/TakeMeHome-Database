@@ -9,7 +9,7 @@ import Login from './login'; // Import Login component
 
 function App() {
   useEffect(() => {
-    fetch('http://localhost:8081/Users')
+    fetch('http://localhost:8081/api/users') // Corrected endpoint
       .then(res => res.json())
       .then(result => console.log(result))
       .catch(err => console.log(err));
