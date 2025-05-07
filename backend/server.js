@@ -301,8 +301,11 @@ app.get('/api/listings', async (req, res) => {
 
         try {
             const combinedQuery = `${offerQuery} UNION ${requestQuery}`;
-            const [rows] = await db.query(combinedQuery);
-            return res.status(200).json({ listings: rows });
+            const countQuery = `SELECT COUNT(*) AS total
+                FROM (${combinedQuery}) AS all_listings`;
+            const [listings] = await db.query(combinedQuery);
+            const [[{ total }]] = await db.query(countQuery);
+            return res.status(200).json({ listings, total });
         } catch (err) {
             console.error('Error fetching listings:', err);
             return res.status(500).json({ message: 'Error fetching listings' });

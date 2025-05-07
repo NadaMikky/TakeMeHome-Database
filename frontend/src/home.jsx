@@ -4,6 +4,7 @@ import './home.css'; // Importing CSS for styling
 
 function Home() {
   const [listings, setListings]         = useState([]);
+  const [total, setTotal]               = useState(0);
 
   // Fetch listings from the server
     useEffect(() => {
@@ -16,6 +17,7 @@ function Home() {
           const data = await resp.json();
           if (resp.ok) {
             setListings(data.listings);
+            setTotal(data.total);
           } else {
             console.error('Failed to fetch listings:', data.message);
           }
@@ -43,7 +45,7 @@ function Home() {
 
       {/* Featured Listings */}
       <section className="featured-listings">
-        <h2>Available Listings</h2> {/* Section title */}
+        <h2>{total} Current Listings</h2> {/* Section title */}
         <div className="listing-grid">
           {/* Example listing card */}
           {listings
