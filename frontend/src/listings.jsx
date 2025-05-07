@@ -195,12 +195,12 @@ export default function Listings() {
             .filter((listing) => {
               // For Offers: Check if Passenger_ID is '0' (not accepted)
               if (listing.type === 'offer') {
-                return listing.Passenger_ID === '0';
+                return listing.Passenger_ID === 'No passenger assigned';
               }
           
               // For Requests: Check if Driver_ID is '0' (not accepted)
               if (listing.type === 'request') {
-                return listing.Driver_ID === '0';
+                return listing.Driver_ID === 'No driver assigned';
               }
           
               return true; // Default case, just in case
