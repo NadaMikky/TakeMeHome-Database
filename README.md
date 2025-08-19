@@ -50,4 +50,5 @@ Click the local host link
 ```
 * OR Open your browser and visit: [http://localhost:5173/](http://localhost:5173/)
 
+You can use other tools to troubleshoot if you come acorss errors!
 ---
